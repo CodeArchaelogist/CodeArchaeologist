@@ -313,7 +313,7 @@ The goal is to generate an **evidence-backed explanation**.
 
 ---
 
-# 🔎 Decision Forensics
+#  Decision Forensics
 
 Decision Forensics is one of the core experiences of CodeArchaeologist.
 
@@ -778,34 +778,6 @@ POST /api/investigations/:id/questions
 
 ---
 
-# 🔐 Environment Variables
-
-## Backend
-
-```env
-PORT=
-MONGODB_URI=
-GITHUB_TOKEN=
-AI_SERVICE_URL=
-CORS_ORIGIN=
-JWT_SECRET=
-```
-
-## AI Service
-
-```env
-LLM_API_KEY=
-GITHUB_TOKEN=
-VECTOR_DB_URL=
-VECTOR_DB_API_KEY=
-```
-
-## Frontend
-
-```env
-VITE_API_URL=
-```
-
 > Never commit API keys, database credentials, GitHub tokens or other secrets to the repository.
 
 ---
@@ -829,7 +801,7 @@ Make sure you have:
 ## 1. Clone the Repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/CodeArchaeologist.git
+git clone https://github.com/CodeArchaelogist/CodeArchaeologist.git
 
 cd CodeArchaeologist
 ```
@@ -839,7 +811,7 @@ cd CodeArchaeologist
 ## 2. Install Frontend
 
 ```bash
-cd frontend
+cd CodeArchaeologist-Frontend
 npm install
 ```
 
@@ -848,7 +820,7 @@ npm install
 ## 3. Install Backend
 
 ```bash
-cd ../backend
+cd ../CodeArchaeologist-Backend
 npm install
 ```
 
@@ -911,7 +883,7 @@ uvicorn main:app --reload
 
 ---
 
-# 🐳 Docker
+#  Docker
 
 The project can also be containerized so that the frontend, backend, AI service and supporting infrastructure can be run consistently across development and deployment environments.
 
@@ -921,7 +893,7 @@ docker compose up --build
 
 ---
 
-# 🌐 Deployment Architecture
+#  Deployment Architecture
 
 ```text
                        INTERNET
@@ -956,7 +928,7 @@ docker compose up --build
 
 ---
 
-# 🧪 Example Investigation
+#  Example Investigation
 
 ### User
 
