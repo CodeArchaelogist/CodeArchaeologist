@@ -1,1 +1,56 @@
-@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    color-scheme: dark;
+}
+
+html,
+body,
+#root {
+    height: 100%;
+    background-color: #05070B;
+}
+
+body {
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+    background: rgba(63, 208, 255, 0.25);
+    color: #EDF0F5;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #1E2530;
+    border-radius: 8px;
+    border: 2px solid #05070B;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #2A3342;
+}
+
+.evidence-trail {
+    background-image: linear-gradient(to bottom, transparent, transparent 4px, #1E2530 4px, #1E2530 8px);
+    background-size: 1px 8px;
+    background-repeat: repeat-y;
+}
+
+.focus-ring:focus-visible {
+    outline: 2px solid #3FD0FF;
+    outline-offset: 2px;
+}
