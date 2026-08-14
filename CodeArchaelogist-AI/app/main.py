@@ -5,6 +5,7 @@ from app.services.code_analyzer import analyze_repository_code
 from app.services.dependency_analyzer import build_dependency_graph
 from app.services.impact_analyzer import build_reverse_dependency_graph
 from app.services.git_diff_analyzer import get_commit_diff
+from app.services.evidence_builder import build_investigation_evidence
 
 from app.services.git_analyzer import get_commit_history
 from app.services.github_service import clone_repository
@@ -65,6 +66,16 @@ def analyze_repository_endpoint(request: RepositoryRequest):
             limit=20
         )
 
+        evidence = build_investigation_evidence(
+            code_analysis=code_analysis,
+            dependencies=dependency_graph,
+            impact_analysis=impact_graph,
+            history={
+                "commits": commits,
+                "total_commits_returned": len(commits)
+            }
+        )
+
         return {
             "status": "success",
             "repository": {
@@ -81,18 +92,17 @@ def analyze_repository_endpoint(request: RepositoryRequest):
             "history": {
                 "commits": commits,
                 "total_commits_returned": len(commits)
-            }
+            },
+            "evidence": evidence
         }
 
     except ValueError as e:
-
         raise HTTPException(
             status_code=400,
             detail=str(e)
         )
 
     except RuntimeError as e:
-
         raise HTTPException(
             status_code=500,
             detail=str(e)
@@ -108,9 +118,41 @@ def analyze_commit_endpoint(
     try:
         repository = clone_repository(repo_url)
 
+        code_analysis = analyze_repository_code(
+            repository["path"]
+        )
+
+        dependency_graph = build_dependency_graph(
+            code_analysis,
+            repository["path"]
+        )
+
+        impact_graph = build_reverse_dependency_graph(
+            dependency_graph
+        )
+
         diff = get_commit_diff(
             repository["path"],
             commit_hash
+        )
+
+        commits = get_commit_history(
+            repository["path"],
+            limit=20
+        )
+
+        evidence = build_investigation_evidence(
+            code_analysis={
+                "files": code_analysis,
+                "total_files_analyzed": len(code_analysis)
+            },
+            dependencies=dependency_graph,
+            impact_analysis=impact_graph,
+            history={
+                "commits": commits,
+                "total_commits_returned": len(commits)
+            },
+            commit_diff=diff
         )
 
         return {
@@ -119,18 +161,19 @@ def analyze_commit_endpoint(
                 "owner": repository["owner"],
                 "name": repository["repo"]
             },
-            "evidence": diff
+            "commit": {
+                "hash": commit_hash
+            },
+            "evidence": evidence
         }
 
     except ValueError as e:
-
         raise HTTPException(
             status_code=400,
             detail=str(e)
         )
 
     except RuntimeError as e:
-
         raise HTTPException(
             status_code=500,
             detail=str(e)
