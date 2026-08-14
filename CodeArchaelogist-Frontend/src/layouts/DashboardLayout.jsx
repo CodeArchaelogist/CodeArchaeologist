@@ -9,10 +9,10 @@ export default function DashboardLayout() {
     return (
         <div className="flex h-screen bg-void">
             <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-            <div className="flex flex-1 flex-col overflow-hidden">
+            <div className="relative flex flex-1 flex-col overflow-hidden">
                 <Navbar onMenuClick={() => setSidebarOpen(true)} />
-                <main className="flex-1 overflow-y-auto px-4 py-6 sm:px-6 lg:px-8">
-                    <div className="mx-auto max-w-6xl">
+                <main className="relative flex-1 overflow-y-auto px-4 py-6 sm:px-6 lg:px-8">
+                    <div className="relative mx-auto max-w-6xl">
                         <Outlet />
                     </div>
                 </main>

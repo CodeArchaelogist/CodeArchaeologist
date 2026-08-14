@@ -4,6 +4,7 @@ import { TbBrandGithub, TbArrowRight, TbShieldCheck, TbClock } from "react-icons
 import BackButton from "../components/ui/BackButton.jsx";
 import Button from "../components/ui/Button.jsx";
 import { getRecentRepositories } from "../services/api.js";
+import ThemeToggle from "../components/ui/ThemeToggle.jsx";
 
 export default function RepositoryInput() {
     const [url, setUrl] = useState("");
@@ -20,9 +21,12 @@ export default function RepositoryInput() {
     };
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-void px-6">
+        <div className="relative z-10 flex min-h-screen items-center justify-center overflow-hidden px-6">
             <div className="w-full max-w-xl">
-                <BackButton className="mb-6" />
+                <div className="mb-6 flex items-center justify-between">
+                    <BackButton />
+                    <ThemeToggle />
+                </div>
                 <p className="text-center font-mono text-[11px] uppercase tracking-widest text-accent">
                     New investigation
                 </p>

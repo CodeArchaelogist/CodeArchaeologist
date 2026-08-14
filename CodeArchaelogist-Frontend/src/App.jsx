@@ -9,32 +9,36 @@ import EvolutionTimeline from "./pages/EvolutionTimeline.jsx";
 import DecisionForensics from "./pages/DecisionForensics.jsx";
 import RiskImpact from "./pages/RiskImpact.jsx";
 import AskArchaeologist from "./pages/AskArchaelogist.jsx";
+import DeepScanBackground from "./components/DeepScanBackground.jsx";
 
 export default function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Landing />} />
-      <Route path="/analyze" element={<RepositoryInput />} />
-      <Route path="/investigation/:id" element={<Investigation />} />
+    <>
+      <DeepScanBackground />
+      <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route path="/analyze" element={<RepositoryInput />} />
+        <Route path="/investigation/:id" element={<Investigation />} />
 
-      <Route path="/dashboard/:id" element={<DashboardLayout />}>
-        <Route index element={<Dashboard />} />
-      </Route>
-      <Route path="/repository-dna/:id" element={<DashboardLayout />}>
-        <Route index element={<RepositoryDNA />} />
-      </Route>
-      <Route path="/timeline/:id" element={<DashboardLayout />}>
-        <Route index element={<EvolutionTimeline />} />
-      </Route>
-      <Route path="/decisions/:id" element={<DashboardLayout />}>
-        <Route index element={<DecisionForensics />} />
-      </Route>
-      <Route path="/risks/:id" element={<DashboardLayout />}>
-        <Route index element={<RiskImpact />} />
-      </Route>
-      <Route path="/ask/:id" element={<DashboardLayout />}>
-        <Route index element={<AskArchaeologist />} />
-      </Route>
-    </Routes>
+        <Route path="/dashboard/:id" element={<DashboardLayout />}>
+          <Route index element={<Dashboard />} />
+        </Route>
+        <Route path="/repository-dna/:id" element={<DashboardLayout />}>
+          <Route index element={<RepositoryDNA />} />
+        </Route>
+        <Route path="/timeline/:id" element={<DashboardLayout />}>
+          <Route index element={<EvolutionTimeline />} />
+        </Route>
+        <Route path="/decisions/:id" element={<DashboardLayout />}>
+          <Route index element={<DecisionForensics />} />
+        </Route>
+        <Route path="/risks/:id" element={<DashboardLayout />}>
+          <Route index element={<RiskImpact />} />
+        </Route>
+        <Route path="/ask/:id" element={<DashboardLayout />}>
+          <Route index element={<AskArchaeologist />} />
+        </Route>
+      </Routes>
+    </>
   );
 }

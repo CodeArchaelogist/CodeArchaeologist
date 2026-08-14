@@ -5,6 +5,7 @@ import AgentPipeline from "../components/AgentPipeline.jsx";
 import InvestigationProgress from "../components/InvestigationProgress.jsx";
 import { getInvestigation } from "../services/api.js";
 import BackButton from "../components/ui/BackButton.jsx";
+import ThemeToggle from "../components/ui/ThemeToggle.jsx";
 
 export default function Investigation() {
     const { id } = useParams();
@@ -32,7 +33,7 @@ export default function Investigation() {
     return (
         <div className="min-h-screen bg-void px-6 py-10">
             <div className="mx-auto max-w-5xl">
-                <div className="flex items-center justify-between border-b border-border-subtle pb-5">
+                <div className="flex items-start justify-between border-b border-border-subtle pb-5">
                     <div>
                         <BackButton className="mb-3" />
                         <p className="font-mono text-[11px] uppercase tracking-widest text-accent">
@@ -42,7 +43,10 @@ export default function Investigation() {
                             {data.repository.fullName}
                         </h1>
                     </div>
-                    <span className="font-mono text-xs text-text-faint">{data.repository.branch}</span>
+                    <div className="flex items-center gap-3">
+                        <span className="font-mono text-xs text-text-faint">{data.repository.branch}</span>
+                        <ThemeToggle />
+                    </div>
                 </div>
 
                 <div className="mt-6">

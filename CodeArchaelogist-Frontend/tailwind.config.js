@@ -1,39 +1,40 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+    darkMode: "class",
     content: ["./index.html", "./src/**/*.{js,jsx}"],
     theme: {
         extend: {
             colors: {
-                void: "#05070B",
+                void: "rgb(var(--color-void) / <alpha-value>)",
                 surface: {
-                    DEFAULT: "#0D111A",
-                    elevated: "#141A24",
-                    high: "#181F2B",
+                    DEFAULT: "rgb(var(--color-surface) / <alpha-value>)",
+                    elevated: "rgb(var(--color-surface-elevated) / <alpha-value>)",
+                    high: "rgb(var(--color-surface-high) / <alpha-value>)",
                 },
                 border: {
-                    DEFAULT: "#1E2530",
-                    subtle: "#171D27",
+                    DEFAULT: "rgb(var(--color-border) / <alpha-value>)",
+                    subtle: "rgb(var(--color-border-subtle) / <alpha-value>)",
                 },
                 accent: {
-                    DEFAULT: "#3FD0FF",
-                    dim: "#1D8FB8",
+                    DEFAULT: "rgb(var(--color-accent) / <alpha-value>)",
+                    dim: "rgb(var(--color-accent-dim) / <alpha-value>)",
                 },
                 evidence: {
-                    DEFAULT: "#D9A441",
-                    dim: "#9A752F",
+                    DEFAULT: "rgb(var(--color-evidence) / <alpha-value>)",
+                    dim: "rgb(var(--color-evidence-dim) / <alpha-value>)",
                 },
                 danger: {
-                    DEFAULT: "#F0554A",
-                    dim: "#7A2E29",
+                    DEFAULT: "rgb(var(--color-danger) / <alpha-value>)",
+                    dim: "rgb(var(--color-danger-dim) / <alpha-value>)",
                 },
                 success: {
-                    DEFAULT: "#3FCB8A",
-                    dim: "#255C42",
+                    DEFAULT: "rgb(var(--color-success) / <alpha-value>)",
+                    dim: "rgb(var(--color-success-dim) / <alpha-value>)",
                 },
                 text: {
-                    primary: "#EDF0F5",
-                    muted: "#8A93A3",
-                    faint: "#5B6474",
+                    primary: "rgb(var(--color-text-primary) / <alpha-value>)",
+                    muted: "rgb(var(--color-text-muted) / <alpha-value>)",
+                    faint: "rgb(var(--color-text-faint) / <alpha-value>)",
                 },
             },
             fontFamily: {
@@ -48,9 +49,19 @@ export default {
                     "0%, 100%": { opacity: 1 },
                     "50%": { opacity: 0.35 },
                 },
+                ambientPulse: {
+                    "0%, 100%": { opacity: 0.5 },
+                    "50%": { opacity: 1 },
+                },
+                ambientDrift: {
+                    "0%": { backgroundPosition: "0px 0px" },
+                    "100%": { backgroundPosition: "48px 48px" },
+                },
             },
             animation: {
                 pulseDot: "pulseDot 1.8s ease-in-out infinite",
+                ambientPulse: "ambientPulse 6s ease-in-out infinite",
+                ambientDrift: "ambientDrift 40s linear infinite",
             },
         },
     },

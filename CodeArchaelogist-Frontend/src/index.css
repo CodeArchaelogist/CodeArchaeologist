@@ -5,24 +5,78 @@
 @tailwind utilities;
 
 :root {
+    color-scheme: light;
+
+    --color-void: 255 255 255;
+    --color-surface: 247 249 252;
+    --color-surface-elevated: 239 242 247;
+    --color-surface-high: 230 234 241;
+
+    --color-border: 225 229 235;
+    --color-border-subtle: 235 238 242;
+
+    --color-accent: 10 126 164;
+    --color-accent-dim: 11 91 119;
+
+    --color-evidence: 180 121 31;
+    --color-evidence-dim: 140 93 24;
+
+    --color-danger: 214 59 48;
+    --color-danger-dim: 168 42 33;
+
+    --color-success: 30 159 99;
+    --color-success-dim: 23 117 74;
+
+    --color-text-primary: 18 22 31;
+    --color-text-muted: 85 96 111;
+    --color-text-faint: 136 145 160;
+}
+
+.dark {
     color-scheme: dark;
+
+    --color-void: 5 7 11;
+    --color-surface: 13 17 26;
+    --color-surface-elevated: 20 26 36;
+    --color-surface-high: 24 31 43;
+
+    --color-border: 30 37 48;
+    --color-border-subtle: 23 29 39;
+
+    --color-accent: 63 208 255;
+    --color-accent-dim: 29 143 184;
+
+    --color-evidence: 217 164 65;
+    --color-evidence-dim: 154 117 47;
+
+    --color-danger: 240 85 74;
+    --color-danger-dim: 122 46 41;
+
+    --color-success: 63 203 138;
+    --color-success-dim: 37 92 66;
+
+    --color-text-primary: 237 240 245;
+    --color-text-muted: 138 147 163;
+    --color-text-faint: 91 100 116;
 }
 
 html,
 body,
 #root {
     height: 100%;
-    background-color: #05070B;
 }
 
 body {
     font-family: 'Inter', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
+    background-color: rgb(var(--color-void));
+    color: rgb(var(--color-text-primary));
+    transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 ::selection {
-    background: rgba(63, 208, 255, 0.25);
-    color: #EDF0F5;
+    background: rgb(var(--color-accent) / 0.25);
+    color: rgb(var(--color-text-primary));
 }
 
 ::-webkit-scrollbar {
@@ -35,22 +89,31 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-    background-color: #1E2530;
+    background-color: rgb(var(--color-border));
     border-radius: 8px;
-    border: 2px solid #05070B;
+    border: 2px solid rgb(var(--color-void));
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background-color: #2A3342;
+    background-color: rgb(var(--color-border-subtle));
 }
 
 .evidence-trail {
-    background-image: linear-gradient(to bottom, transparent, transparent 4px, #1E2530 4px, #1E2530 8px);
+    background-image: linear-gradient(to bottom,
+            transparent,
+            transparent 4px,
+            rgb(var(--color-border)) 4px,
+            rgb(var(--color-border)) 8px);
     background-size: 1px 8px;
     background-repeat: repeat-y;
 }
 
 .focus-ring:focus-visible {
-    outline: 2px solid #3FD0FF;
+    outline: 2px solid rgb(var(--color-accent));
     outline-offset: 2px;
+}
+
+.ambient-grid {
+    background-image: radial-gradient(rgb(var(--color-accent)) 1px, transparent 1px);
+    background-size: 24px 24px;
 }

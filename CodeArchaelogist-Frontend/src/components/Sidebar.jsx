@@ -46,7 +46,7 @@ export default function Sidebar({ open, onClose }) {
                             <span className="font-mono text-xs font-bold">CA</span>
                         </div>
                         <span className="text-[13px] font-semibold tracking-wide text-text-primary">
-                            CODEARCHAEOLOGIST
+                           <a href="/">CODEARCHAEOLOGIST</a>
                         </span>
                     </div>
                     <button
