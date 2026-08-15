@@ -497,6 +497,145 @@ The AI uses repository-specific context rather than relying only on general mode
 
 ---
 
+# Project Structure
+
+```text
+CodeArchaeologist/
+│
+├── CodeArchaeologist-AI/              # AI-powered code analysis & reasoning service
+│   │
+│   ├── app/
+|   |
+│   │   ├── api/
+│   │   │   └── routes.py              # API route definitions
+│   │   │
+│   │   ├── core/
+│   │   │   └── config.py               # Application configuration
+│   │   │
+│   │   ├── models/
+│   │   │   └── schemas.py              # Pydantic request/response schemas
+│   │   │
+│   │   ├── services/
+│   │   │   ├── code_analyzer.py        # Source-code analysis
+│   │   │   ├── dependency_analyzer.py  # Dependency & relationship analysis
+│   │   │   ├── evidence_builder.py     # Evidence collection & grounding
+│   │   │   ├── git_analyzer.py         # Git repository analysis
+│   │   │   ├── git_diff_analyzer.py    # Commit & diff analysis
+│   │   │   ├── github_service.py       # GitHub integration
+│   │   │   ├── impact_analyzer.py      # Change-impact & risk analysis
+│   │   │   ├── investigation_engine.py # System investigation workflow
+│   │   │   ├── reasoning_engine.py     # AI reasoning & inference
+│   │   │   └── repo_analyzer.py        # Repository-level analysis
+│   │   │
+│   │   ├── __init__.py
+│   │   └── main.py                     # FastAPI application entry point
+│   │
+│   ├── .env.example                    # Environment variable template
+│   ├── .gitignore
+│   └── requirements.txt                 # Python dependencies
+│
+├── CodeArchaeologist-Backend/          # Node.js backend & application services
+│   │
+│   ├── src/
+│   │   ├── db/
+│   │   │   └── index.js                # Database connection
+│   │   │
+│   │   ├── utils/
+│   │   │   ├── ApiError.js             # Standardized API errors
+│   │   │   ├── ApiResponse.js          # Standardized API responses
+│   │   │   └── AsyncHandler.js         # Async error handling
+│   │   │
+│   │   ├── app.js                      # Express application setup
+│   │   ├── constants.js                 # Application constants
+│   │   └── index.js                    # Backend entry point
+│   │
+│   ├── .env.sample                     # Environment variable template
+│   ├── .gitignore
+│   ├── .prettierignore
+│   ├── .prettierrc
+│   ├── package.json                    # Node.js dependencies & scripts
+│   └── package-lock.json
+│
+├── CodeArchaeologist-Frontend/         # React-based web interface
+│   │
+│   ├── src/
+│   │   │
+│   │   ├── components/
+│   │   │   ├── ui/
+│   │   │   │   ├── BackButton.jsx
+│   │   │   │   ├── Button.jsx
+│   │   │   │   ├── EmptyState.jsx
+│   │   │   │   ├── LoadingState.jsx
+│   │   │   │   ├── Modal.jsx
+│   │   │   │   ├── StatusBadge.jsx
+│   │   │   │   ├── Tabs.jsx
+│   │   │   │   └── ThemeToggle.jsx
+│   │   │   │
+│   │   │   ├── AgentCard.jsx
+│   │   │   ├── AgentPipeline.jsx
+│   │   │   ├── CodeSnippet.jsx
+│   │   │   ├── ConfidenceScore.jsx
+│   │   │   ├── DecisionCard.jsx
+│   │   │   ├── DeepScanBackground.jsx
+│   │   │   ├── DependencyGraph.jsx
+│   │   │   ├── EvidenceCard.jsx
+│   │   │   ├── EvidenceList.jsx
+│   │   │   ├── InvestigationProgress.jsx
+│   │   │   ├── MetricCard.jsx
+│   │   │   ├── Navbar.jsx
+│   │   │   ├── PageHeader.jsx
+│   │   │   ├── RepositoryHealth.jsx
+│   │   │   ├── RiskCard.jsx
+│   │   │   ├── Searchbar.jsx
+│   │   │   ├── Sidebar.jsx
+│   │   │   ├── Timeline.jsx
+│   │   │   └── TimelineEvent.jsx
+│   │   │
+│   │   ├── context/
+│   │   │   └── ThemeContext.jsx        # Theme state management
+│   │   │
+│   │   ├── data/
+│   │   │   └── mockData.js             # Development/demo data
+│   │   │
+│   │   ├── layouts/
+│   │   │   └── DashboardLayout.jsx     # Dashboard layout
+│   │   │
+│   │   ├── pages/
+│   │   │   ├── AskArchaeologist.jsx
+│   │   │   ├── Dashboard.jsx
+│   │   │   ├── DecisionForensics.jsx
+│   │   │   ├── EvolutionTimeline.jsx
+│   │   │   ├── Investigation.jsx
+│   │   │   ├── Landing.jsx
+│   │   │   ├── RepositoryDNA.jsx
+│   │   │   ├── RepositoryInput.jsx
+│   │   │   └── RiskImpact.jsx
+│   │   │
+│   │   ├── services/
+│   │   │   └── api.js                  # Frontend API communication
+│   │   │
+│   │   ├── App.jsx                     # Root React component
+│   │   ├── index.css                   # Global styles
+│   │   └── main.jsx                    # React entry point
+│   │
+│   ├── .env
+│   ├── .env.sample
+│   ├── .gitignore
+│   ├── eslint.config.js
+│   ├── index.html
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── postcss.config.js
+│   ├── tailwind.config.js
+│   ├── vite.config.js
+│   └── README.md
+│
+└── README.md                           # Project documentation
+```
+
+---
+
+
 #  System Architecture
 
 ```mermaid
