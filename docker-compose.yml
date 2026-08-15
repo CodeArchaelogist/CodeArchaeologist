@@ -1,0 +1,26 @@
+services:
+  ai-service:
+    build:
+      context: ./CodeArchaelogist-AI
+    ports:
+      - "5000:8000" 
+    env_file:
+      - ./CodeArchaelogist-AI/.env 
+
+  backend:
+    build:
+      context: ./CodeArchaelogist-Backend
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./CodeArchaelogist-Backend/.env 
+    depends_on:
+      - ai-service
+
+  frontend:
+    build:
+      context: ./CodeArchaelogist-Frontend
+    ports:
+      - "8082:80" 
+    depends_on:
+      - backend
