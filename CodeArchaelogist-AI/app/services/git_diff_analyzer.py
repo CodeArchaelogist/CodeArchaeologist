@@ -1,9 +1,11 @@
+import re
 import subprocess
 
 
 def get_commit_diff(repo_path: str, commit_hash: str):
     """
-    Get the actual code changes for a specific Git commit.
+    Get the actual code changes and changed files
+    for a specific Git commit.
     """
 
     if not repo_path or not commit_hash:
@@ -35,10 +37,19 @@ def get_commit_diff(repo_path: str, commit_hash: str):
                 "message": result.stderr.strip()
             }
 
+        diff_text = result.stdout
+
+        changed_files = re.findall(
+            r"^\+\+\+ b/(.+)$",
+            diff_text,
+            re.MULTILINE
+        )
+
         return {
             "status": "success",
             "commit": commit_hash,
-            "diff": result.stdout
+            "changed_files": sorted(set(changed_files)),
+            "diff": diff_text
         }
 
     except Exception as e:

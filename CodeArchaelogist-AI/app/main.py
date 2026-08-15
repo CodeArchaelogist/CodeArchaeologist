@@ -138,6 +138,48 @@ def analyze_commit_endpoint(
             commit_hash
         )
 
+        if diff.get("status") == "error":
+            raise ValueError(
+                diff.get("message", "Failed to analyze commit")
+            )
+
+        changed_files = diff.get(
+            "changed_files",
+            []
+        )
+
+        # Keep only code files changed by this commit
+        relevant_code_analysis = [
+            file_data
+            for file_data in code_analysis
+            if any(
+                file_data.get(
+                    "file",
+                    ""
+                ).replace("\\", "/").endswith(
+                    changed_file.replace("\\", "/")
+                )
+                for changed_file in changed_files
+            )
+        ]
+
+        # Keep dependencies of changed files
+        relevant_dependencies = [
+            item
+            for item in dependency_graph
+            if item.get("file") in changed_files
+        ]
+
+        # Keep impact information for changed files
+        relevant_impact = {}
+
+        for changed_file in changed_files:
+
+            if changed_file in impact_graph:
+                relevant_impact[changed_file] = (
+                    impact_graph[changed_file]
+                )
+
         commits = get_commit_history(
             repository["path"],
             limit=20
@@ -145,34 +187,46 @@ def analyze_commit_endpoint(
 
         evidence = build_investigation_evidence(
             code_analysis={
-                "files": code_analysis,
-                "total_files_analyzed": len(code_analysis)
+                "files": relevant_code_analysis,
+                "total_files_analyzed": len(
+                    relevant_code_analysis
+                )
             },
-            
-            dependencies=dependency_graph,
-            impact_analysis=impact_graph,
+
+            dependencies=relevant_dependencies,
+
+            impact_analysis=relevant_impact,
+
             history={
+                "target_commit": commit_hash,
                 "commits": commits,
                 "total_commits_returned": len(commits)
             },
+
             commit_diff=diff
         )
+
         investigation = investigate_evidence(
-          evidence=evidence,
-          question=question
-)
+            evidence=evidence,
+            question=question
+        )
 
         return {
             "status": "success",
+
             "repository": {
                 "owner": repository["owner"],
                 "name": repository["repo"]
             },
+
             "commit": {
-                "hash": commit_hash
+                "hash": commit_hash,
+                "changed_files": changed_files
             },
+
             "evidence": evidence,
-            "investigation":investigation
+
+            "investigation": investigation
         }
 
     except ValueError as e:
