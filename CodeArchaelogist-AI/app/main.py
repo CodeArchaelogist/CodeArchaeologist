@@ -6,6 +6,7 @@ from app.services.dependency_analyzer import build_dependency_graph
 from app.services.impact_analyzer import build_reverse_dependency_graph
 from app.services.git_diff_analyzer import get_commit_diff
 from app.services.evidence_builder import build_investigation_evidence
+from app.services.investigation_engine import investigate_evidence
 
 from app.services.git_analyzer import get_commit_history
 from app.services.github_service import clone_repository
@@ -112,7 +113,8 @@ def analyze_repository_endpoint(request: RepositoryRequest):
 @app.post("/analyze-commit")
 def analyze_commit_endpoint(
     repo_url: str,
-    commit_hash: str
+    commit_hash: str,
+    question: str
 ):
 
     try:
@@ -146,6 +148,7 @@ def analyze_commit_endpoint(
                 "files": code_analysis,
                 "total_files_analyzed": len(code_analysis)
             },
+            
             dependencies=dependency_graph,
             impact_analysis=impact_graph,
             history={
@@ -154,6 +157,10 @@ def analyze_commit_endpoint(
             },
             commit_diff=diff
         )
+        investigation = investigate_evidence(
+          evidence=evidence,
+          question=question
+)
 
         return {
             "status": "success",
@@ -164,7 +171,8 @@ def analyze_commit_endpoint(
             "commit": {
                 "hash": commit_hash
             },
-            "evidence": evidence
+            "evidence": evidence,
+            "investigation":investigation
         }
 
     except ValueError as e:
