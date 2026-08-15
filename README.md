@@ -779,6 +779,169 @@ POST /api/investigations/:id/questions
 ---
 
 > Never commit API keys, database credentials, GitHub tokens or other secrets to the repository.
+## AI Commit Investigation API
+
+The AI service provides commit-level investigation using repository code analysis, Git history, commit diffs, dependency analysis, impact analysis, evidence building, and LLM-based reasoning.
+
+### Endpoint
+
+```http
+POST /analyze-commit
+```
+
+### Request Parameters
+
+The endpoint accepts the following query parameters:
+
+| Parameter | Type | Description |
+|---|---|---|
+| `repo_url` | string | GitHub repository URL to analyze |
+| `commit_hash` | string | Git commit hash to investigate |
+| `question` | string | Engineering question about the selected commit |
+
+### Example Request
+
+```text
+POST /analyze-commit?repo_url=https://github.com/CodeArchaelogist/CodeArchaelogist&commit_hash=30d3341cb4963922846d2b8df06a4ba6d6f1aab7&question=Why%20was%20this%20commit%20introduced%20and%20what%20could%20be%20affected%20by%20this%20change%3F
+```
+
+### Example Input
+
+```json
+{
+  "repo_url": "https://github.com/CodeArchaelogist/CodeArchaelogist",
+  "commit_hash": "30d3341cb4963922846d2b8df06a4ba6d6f1aab7",
+  "question": "Why was this commit introduced and what could be affected by this change?"
+}
+```
+
+> **Note:** The current FastAPI implementation accepts these values as query parameters. The JSON above represents the input values conceptually; the actual request format is the query-parameter URL shown above.
+
+### Example Response
+
+```json
+{
+  "status": "success",
+  "repository": {
+    "owner": "CodeArchaelogist",
+    "name": "CodeArchaelogist"
+  },
+  "commit": {
+    "hash": "30d3341cb4963922846d2b8df06a4ba6d6f1aab7",
+    "changed_files": []
+  },
+  "evidence": {
+    "code": {},
+    "dependencies": {},
+    "impact": {},
+    "history": {},
+    "commit_diff": {}
+  },
+  "investigation": {
+    "historical_intent": "Explanation of the historical purpose of the change.",
+    "evidence": [
+      "Repository evidence supporting the investigation."
+    ],
+    "impact": [
+      "Potentially affected files or components."
+    ],
+    "risk": {
+      "level": "Medium",
+      "reasons": [
+        "Potential risks identified from the available repository evidence."
+      ]
+    },
+    "confidence": "Medium",
+    "uncertainty": [
+      "Information that cannot be established from the available evidence."
+    ]
+  }
+}
+```
+
+### Investigation Response Fields
+
+| Field | Description |
+|---|---|
+| `historical_intent` | Explanation of what the available repository evidence suggests about why the change or code exists. |
+| `evidence` | Specific repository evidence supporting the investigation, such as commits, changed files, dependencies, impact relationships, or diffs. |
+| `impact` | Repository files or components that may be affected by the change. |
+| `risk.level` | Overall risk level identified from the available evidence. |
+| `risk.reasons` | Reasons supporting the assigned risk level. |
+| `confidence` | Confidence level of the investigation: `High`, `Medium`, or `Low`. |
+| `uncertainty` | Information that cannot be established from the available repository evidence. |
+
+### AI Investigation Flow
+
+```text
+Repository URL
+      ↓
+Commit Hash + Question
+      ↓
+Code Analysis
+      ↓
+Git History + Commit Diff
+      ↓
+Dependency Analysis
+      ↓
+Impact Analysis
+      ↓
+Evidence Builder
+      ↓
+Evidence Compaction
+      ↓
+Groq LLM Investigation
+      ↓
+Historical Intent + Evidence + Impact
+      ↓
+Risk + Confidence + Uncertainty
+      ↓
+Structured Investigation Response
+```
+
+### AI Environment Configuration
+
+The AI service requires the following environment variable:
+
+```env
+GROQ_API_KEY=
+```
+
+The actual Groq API key must be configured through the environment and must never be committed to the repository.
+
+### Frontend Integration
+
+The frontend/backend integration should provide the following values to the AI service:
+
+```text
+Repository URL
+Commit Hash
+Investigation Question
+```
+
+The frontend can use the returned `investigation` object to display:
+
+```text
+Historical Intent
+Evidence
+Impact
+Risk
+Confidence
+Uncertainty
+```
+
+For example:
+
+```text
+investigation.historical_intent
+investigation.evidence
+investigation.impact
+investigation.risk.level
+investigation.risk.reasons
+investigation.confidence
+investigation.uncertainty
+```
+
 
 ---
 
