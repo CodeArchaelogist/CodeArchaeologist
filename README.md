@@ -669,116 +669,6 @@ AI Investigation
 ```
 
 ---
-
-#  API Workflow
-
-## Start Investigation
-
-```http
-POST /api/investigations
-```
-
-### Request
-
-```json
-{
-  "repoUrl": "https://github.com/example/repository"
-}
-```
-
-### Response
-
-```json
-{
-  "investigationId": "abc123",
-  "status": "queued"
-}
-```
-
----
-
-## Investigation Status
-
-```http
-GET /api/investigations/:id/status
-```
-
-### Response
-
-```json
-{
-  "status": "analyzing",
-  "progress": 67,
-  "currentAgent": "History Agent"
-}
-```
-
----
-
-## Repository Overview
-
-```http
-GET /api/investigations/:id/overview
-```
-
----
-
-## Timeline
-
-```http
-GET /api/investigations/:id/timeline
-```
-
----
-
-## Decision Forensics
-
-```http
-GET /api/investigations/:id/decisions
-```
-
----
-
-## Risk Analysis
-
-```http
-GET /api/investigations/:id/risks
-```
-
----
-
-## Ask CodeArchaeologist
-
-```http
-POST /api/investigations/:id/questions
-```
-
-### Request
-
-```json
-{
-  "question": "Why does PaymentService use the legacy fallback?"
-}
-```
-
-### Response
-
-```json
-{
-  "answer": "The fallback was introduced during...",
-  "confidence": 0.91,
-  "evidence": [
-    {
-      "type": "commit",
-      "id": "a81f2"
-    }
-  ]
-}
-```
-
----
-
-> Never commit API keys, database credentials, GitHub tokens or other secrets to the repository.
 ## AI Commit Investigation API
 
 The AI service provides commit-level investigation using repository code analysis, Git history, commit diffs, dependency analysis, impact analysis, evidence building, and LLM-based reasoning.
@@ -992,7 +882,7 @@ npm install
 ## 4. Install AI Service
 
 ```bash
-cd ../ai-service
+cd ../CodeArchaeologist-AI
 
 python -m venv venv
 
