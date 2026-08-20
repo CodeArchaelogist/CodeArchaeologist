@@ -1,6 +1,8 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
+from app.agents.orchestrator import InvestigationOrchestrator
+
 from app.services.code_analyzer import analyze_repository_code
 from app.services.dependency_analyzer import build_dependency_graph
 from app.services.impact_analyzer import build_reverse_dependency_graph
@@ -189,6 +191,13 @@ def analyze_commit_endpoint(
         repository = clone_repository(
             repo_url
         )
+        orchestrator = InvestigationOrchestrator()
+
+        return orchestrator.investigate(
+           repository=repository,
+           commit_hash=commit_hash,
+           question=question
+)
 
         # ----------------------------------------------------
         # Analyze repository code
@@ -345,10 +354,6 @@ def analyze_commit_endpoint(
 
         # ----------------------------------------------------
         # Add GitHub collaboration evidence
-        #
-        # We add this here instead of passing it into
-        # build_investigation_evidence() because your current
-        # evidence_builder.py does not accept github_history.
         # ----------------------------------------------------
 
         evidence["github_history"] = github_history
