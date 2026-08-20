@@ -3,7 +3,8 @@ def build_investigation_evidence(
     dependencies=None,
     impact_analysis=None,
     history=None,
-    commit_diff=None
+    commit_diff=None,
+    github_history=None
 ):
     """
     Combine repository analysis results into a single
@@ -15,5 +16,6 @@ def build_investigation_evidence(
         "dependencies": dependencies or {},
         "impact": impact_analysis or {},
         "history": history or {},
-        "commit_diff": commit_diff or {}
-    }
+        "commit_diff": commit_diff or {},
+        "github_history": github_history or {}
+    } 
