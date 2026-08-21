@@ -1,5 +1,6 @@
 from pathlib import Path
 from urllib.parse import urlparse
+from dotenv import load_dotenv
 import json
 import os
 import subprocess
@@ -7,6 +8,7 @@ import tempfile
 import urllib.error
 import urllib.request
 
+load_dotenv()
 
 GITHUB_API_BASE = "https://api.github.com"
 
@@ -53,20 +55,20 @@ def clone_repository(repo_url: str):
     temp_directory = tempfile.mkdtemp(
         prefix="codearchaeologist_"
     )
-
     result = subprocess.run(
-        [
-            "git",
-            "clone",
-            "--depth",
-            "100",
-            repo_url,
-            temp_directory
-        ],
-        capture_output=True,
-        text=True
-    )
-
+    [
+        "git",
+        "-c",
+        "credential.helper=manager",
+        "clone",
+        "--depth",
+        "100",
+        repo_url,
+        temp_directory
+    ],
+    capture_output=True,
+    text=True
+)
     if result.returncode != 0:
         raise RuntimeError(
             f"Failed to clone repository: {result.stderr}"

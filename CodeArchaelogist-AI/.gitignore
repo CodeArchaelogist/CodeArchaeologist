@@ -3,3 +3,7 @@ __pycache__/
 *.pyc
 .env
 .pytest_cache/
+# Chroma vector databases
+.chroma/
+.chroma_test/
+.chroma_repository_test/

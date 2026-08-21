@@ -2,6 +2,7 @@ from app.agents.code_agent import CodeAgent
 from app.agents.dependency_agent import DependencyAgent
 from app.agents.history_agent import HistoryAgent
 from app.agents.issue_pr_agent import IssuePRAgent
+from app.agents.rag_agent import RAGAgent
 
 from app.services.evidence_builder import (
     build_investigation_evidence
@@ -30,6 +31,8 @@ class InvestigationOrchestrator:
                         ↓
                   IssuePRAgent
                         ↓
+                     RAGAgent
+                        ↓
                  Evidence Builder
                         ↓
                 Investigation Engine
@@ -48,6 +51,8 @@ class InvestigationOrchestrator:
         self.history_agent = HistoryAgent()
 
         self.issue_pr_agent = IssuePRAgent()
+
+        self.rag_agent = RAGAgent()
 
     def investigate(
         self,
@@ -243,7 +248,22 @@ class InvestigationOrchestrator:
         )
 
         # ==================================================
-        # 9. Build unified evidence
+        # 9. RAG Agent
+        # ==================================================
+
+        rag_result = self.rag_agent.investigate(
+            repo_path=repo_path,
+            question=question,
+            top_k=5
+        )
+
+        retrieved_evidence = rag_result.get(
+            "retrieved_evidence",
+            []
+        )
+
+        # ==================================================
+        # 10. Build unified evidence
         # ==================================================
 
         evidence = build_investigation_evidence(
@@ -274,11 +294,13 @@ class InvestigationOrchestrator:
 
             commit_diff=diff,
 
-            github_history=github_history
+            github_history=github_history,
+
+            rag_evidence=retrieved_evidence
         )
 
         # ==================================================
-        # 10. Reasoning Agent / Investigation Engine
+        # 11. Reasoning Agent / Investigation Engine
         # ==================================================
 
         investigation = investigate_evidence(
@@ -287,7 +309,7 @@ class InvestigationOrchestrator:
         )
 
         # ==================================================
-        # 11. Final structured result
+        # 12. Final structured result
         # ==================================================
 
         return {
@@ -338,7 +360,20 @@ class InvestigationOrchestrator:
                         dict
                     )
                     else "issue_pr_agent"
-                )
+                ),
+
+                "rag_agent": {
+                    "agent": rag_result.get(
+                        "agent"
+                    ),
+                    "status": rag_result.get(
+                        "status"
+                    ),
+                    "total_results": rag_result.get(
+                        "total_results",
+                        0
+                    )
+                }
             },
 
             "evidence": evidence,
