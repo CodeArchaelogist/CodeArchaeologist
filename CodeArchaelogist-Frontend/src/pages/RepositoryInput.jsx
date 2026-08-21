@@ -48,11 +48,6 @@ export default function RepositoryInput() {
             return;
         }
 
-        if (!isAuthenticated) {
-            navigate("/login", { state: { from: { pathname: "/analyze" } } });
-            return;
-        }
-
         setLoading(true);
 
         try {
