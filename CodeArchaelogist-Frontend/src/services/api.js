@@ -16,9 +16,10 @@ import {
 const isDemoMode = () =>
     localStorage.getItem("DEMO_MODE") !== "false";
 
-const API_BASE_URL =
+const API_BASE_URL = (
     import.meta.env.VITE_API_URL ||
-    "http://localhost:5000/api";
+    "http://localhost:3000/api"
+).replace(/\/$/, "");
 
 // Simple in-memory cache to avoid duplicate investigation fetches across tabs
 const investigationCache = new Map();
