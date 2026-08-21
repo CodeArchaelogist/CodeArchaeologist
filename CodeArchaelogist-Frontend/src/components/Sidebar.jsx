@@ -91,12 +91,14 @@ export default function Sidebar({ open, onClose }) {
                 </div>
 
                 <div className="flex flex-col gap-0.5 border-t border-border px-3 py-3">
-                    <button className="focus-ring flex items-center gap-2.5 rounded-md px-3 py-2 text-[13px] text-text-muted hover:bg-surface-elevated/60 hover:text-text-primary">
+                    <Link
+                        to="/profile"
+                        onClick={onClose}
+                        className="focus-ring flex items-center gap-2.5 rounded-md px-3 py-2 text-[13px] text-text-muted hover:bg-surface-elevated/60 hover:text-text-primary"
+                    >
                         <TbUser size={15} strokeWidth={1.75} />
-                        <Link to="/login" className="text-accent hover:underline">
-                            Profile
-                        </Link>
-                    </button>
+                        Profile
+                    </Link>
                 </div>
             </aside>
         </>

@@ -43,10 +43,6 @@ export default function App() {
         <Route path="/ask/:id" element={<DashboardLayout />}>
           <Route index element={<AskArchaeologist />} />
         </Route>
-        <Route path="/login" element={<Login />}>
-        </Route>
-        <Route path="/signup" element={<Signup />}>
-        </Route>
         <Route path="/profile" element={<DashboardLayout />}>
           <Route index element={<Profile />} />
         </Route>

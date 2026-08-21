@@ -1,17 +1,19 @@
+import dotenv from "dotenv";
+dotenv.config();
 import axios from "axios";
-
-const AI_SERVICE_URL =
-    process.env.AI_SERVICE_URL ||
-    "http://127.0.0.1:8000";
 
 export async function analyzeCommit({
     repo_url,
     commit_hash,
     question,
 }) {
+    const aiServiceUrl =
+        process.env.AI_SERVICE_URL ||
+        "http://127.0.0.1:8000";
+
     try {
         const response = await axios.post(
-            `${AI_SERVICE_URL}/analyze-commit`,
+            `${aiServiceUrl}/analyze-commit`,
             {
                 repo_url,
                 commit_hash,
@@ -43,6 +45,7 @@ export async function analyzeCommit({
 
         if (error.response) {
             const err = new Error(
+                error.response.data?.detail ||
                 error.response.data?.message ||
                 "AI service returned an error."
             );
