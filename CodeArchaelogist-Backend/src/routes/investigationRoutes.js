@@ -7,8 +7,6 @@ import {
     askQuestion,
 } from "../controllers/investigationController.js";
 
-import { protect } from "../middleware/authMiddleware.js";
-
 const router = express.Router();
 
 router.post("/", createInvestigation);
