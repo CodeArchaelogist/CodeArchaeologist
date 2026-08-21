@@ -25,8 +25,7 @@ export async function protect(req, res, next) {
         }
 
         req.user = user;
-
-        next();
+        next(); 
     } catch (error) {
         return res.status(401).json({
             message: "Session expired or invalid",

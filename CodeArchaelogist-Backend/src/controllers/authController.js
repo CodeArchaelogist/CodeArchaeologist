@@ -15,7 +15,6 @@ function signToken(userId) {
 function setAuthCookie(res, token) {
     res.cookie("token", token, {
         httpOnly: true,
-
         secure:
             process.env.NODE_ENV === "production",
 
@@ -24,9 +23,7 @@ function setAuthCookie(res, token) {
                 ? "none"
                 : "lax",
 
-        maxAge:
-            7 * 24 * 60 * 60 * 1000,
-
+        maxAge: 7 * 24 * 60 * 60 * 1000,
         path: "/",
     });
 }
@@ -91,6 +88,24 @@ export async function signup(req, res, next) {
             user: sanitizeUser(user),
         });
     } catch (error) {
+        if (error.name === "ValidationError") {
+            const firstError =
+                Object.values(error.errors)[0]?.message;
+
+            return res.status(400).json({
+                message:
+                    firstError ||
+                    "Invalid signup data.",
+            });
+        }
+
+        if (error.code === 11000) {
+            return res.status(409).json({
+                message:
+                    "An account with this email already exists.",
+            });
+        }
+
         next(error);
     }
 }

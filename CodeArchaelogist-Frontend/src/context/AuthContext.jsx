@@ -6,32 +6,26 @@ import {
 } from "react";
 
 import {
-    login as loginRequest,
     signup as signupRequest,
+    login as loginRequest,
     logout as logoutRequest,
     getMe,
 } from "../services/api.js";
 
-const AuthContext =
-    createContext(null);
+const AuthContext = createContext(null);
 
-export function AuthProvider({
-    children,
-}) {
-    const [user, setUser] =
-        useState(null);
-
-    const [loading, setLoading] =
-        useState(true);
+export function AuthProvider({ children }) {
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         async function loadUser() {
             try {
-                const response =
-                    await getMe();
+                const data = await getMe();
 
-                setUser(response.user);
-            } catch {
+                setUser(data?.user || null);
+            } catch (error) {
+                // 401 simply means there is no active session.
                 setUser(null);
             } finally {
                 setLoading(false);
@@ -41,24 +35,22 @@ export function AuthProvider({
         loadUser();
     }, []);
 
-    async function login(credentials) {
-        const response =
-            await loginRequest(
-                credentials
-            );
-
-        setUser(response.user);
-
-        return response.user;
-    }
-
     async function signup(data) {
         const response =
             await signupRequest(data);
 
-        setUser(response.user);
+        setUser(response?.user || null);
 
-        return response.user;
+        return response;
+    }
+
+    async function login(data) {
+        const response =
+            await loginRequest(data);
+
+        setUser(response?.user || null);
+
+        return response;
     }
 
     async function logout() {
@@ -67,26 +59,24 @@ export function AuthProvider({
         setUser(null);
     }
 
+    const value = {
+        user,
+        loading,
+        isAuthenticated: !!user,
+        signup,
+        login,
+        logout,
+    };
+
     return (
-        <AuthContext.Provider
-            value={{
-                user,
-                loading,
-                isAuthenticated:
-                    Boolean(user),
-                login,
-                signup,
-                logout,
-            }}
-        >
+        <AuthContext.Provider value={value}>
             {children}
         </AuthContext.Provider>
     );
 }
 
 export function useAuth() {
-    const context =
-        useContext(AuthContext);
+    const context = useContext(AuthContext);
 
     if (!context) {
         throw new Error(

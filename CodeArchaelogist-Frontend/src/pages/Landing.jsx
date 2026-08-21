@@ -75,9 +75,6 @@ export default function Landing() {
                         <Button variant="secondary" size="sm" onClick={() => navigate("/login")}>
                             Login
                         </Button>
-                        <Button size="sm" onClick={() => navigate("/signup")}>
-                            Signup
-                        </Button>
                     </div>
                 </header>
 
