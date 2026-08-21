@@ -25,12 +25,18 @@ const API_BASE_URL = (
 const investigationCache = new Map();
 
 async function request(endpoint, options = {}) {
+    const token = localStorage.getItem("token");
+    const headers = {
+        "Content-Type": "application/json",
+        ...(options.headers || {}),
+    };
+    if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+    }
+
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         credentials: "include",
-        headers: {
-            "Content-Type": "application/json",
-            ...(options.headers || {}),
-        },
+        headers,
         ...options,
     });
 
@@ -54,21 +60,30 @@ async function request(endpoint, options = {}) {
 /* ---------------- Authentication ---------------- */
 
 export async function signup(data) {
-    return request("/auth/signup", {
+    const res = await request("/auth/signup", {
         method: "POST",
         body: JSON.stringify(data),
     });
+    if (res?.token) {
+        localStorage.setItem("token", res.token);
+    }
+    return res;
 }
 
 export async function login(data) {
-    return request("/auth/login", {
+    const res = await request("/auth/login", {
         method: "POST",
         body: JSON.stringify(data),
     });
+    if (res?.token) {
+        localStorage.setItem("token", res.token);
+    }
+    return res;
 }
 
 export async function logout() {
     investigationCache.clear();
+    localStorage.removeItem("token");
     return request("/auth/logout", {
         method: "POST",
     });

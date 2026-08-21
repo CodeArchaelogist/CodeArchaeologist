@@ -4,10 +4,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { TbEye, TbEyeOff, TbArrowRight, TbMail, TbLock, TbAlertTriangle } from "react-icons/tb";
 import Button from "../components/ui/Button.jsx";
 import ThemeToggle from "../components/ui/ThemeToggle.jsx";
-import { login } from "../services/api.js";
+import { useAuth } from "../context/AuthContext.jsx";
 import BackButton from "../components/ui/BackButton.jsx";
 
 export default function Login() {
+    const { login } = useAuth();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
@@ -17,7 +18,7 @@ export default function Login() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    const redirectTo = "/profile";
+    const redirectTo = "/analyze";
 
     const handleChange = (e) => {
         setForm((f) => ({ ...f, [e.target.name]: e.target.value }));

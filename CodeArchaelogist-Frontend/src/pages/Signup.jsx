@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { TbEye, TbEyeOff, TbArrowRight, TbUser, TbMail, TbLock, TbAlertTriangle, TbCheck } from "react-icons/tb";
 import Button from "../components/ui/Button.jsx";
 import ThemeToggle from "../components/ui/ThemeToggle.jsx";
-import { signup } from "../services/api.js";
+import { useAuth } from "../context/AuthContext.jsx";
 
 function getPasswordStrength(password) {
     if (!password) return { score: 0, label: "" };
@@ -29,6 +29,7 @@ function getPasswordStrength(password) {
 }
 
 export default function Signup() {
+    const { signup } = useAuth();
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -76,13 +77,9 @@ export default function Signup() {
         
         try {
             await signup({ name: form.name, email: form.email, password: form.password });
-            navigate("/", { replace: true }); 
+            navigate("/analyze", { replace: true }); 
         } catch (err) {
-            if (err.message === "Failed to fetch" || err.message.includes("fetch")) {
-                setError("Login first");
-            } else {
-                setError(err.message || "Something went wrong.");
-            }
+            setError(err.message || "Something went wrong.");
         } finally {
             setLoading(false);
         }
