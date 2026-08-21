@@ -29,19 +29,16 @@ function getPasswordStrength(password) {
 }
 
 export default function Signup() {
-    const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
-    const [error, setError] = useState("");
     const navigate = useNavigate();
 
+    // Consolidated State
     const [form, setForm] = useState({
         name: "",
         email: "",
         password: "",
         confirmPassword: "",
     });
+    
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -63,16 +60,27 @@ export default function Signup() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (password !== confirmPassword) {
-            setError("Passwords do not match!");
+        
+        const validationError = validate();
+        if (validationError) {
+            setError(validationError);
             return;
         }
+
         setError("");
+        setLoading(true);
+        
         try {
             await signup({ name: form.name, email: form.email, password: form.password });
-            navigate("/analyze", { replace: true });
+            navigate("/", { replace: true }); 
         } catch (err) {
-            setError(err.message || "Something went wrong.");
+            if (err.message === "Failed to fetch" || err.message.includes("fetch")) {
+                setError("Login first");
+            } else {
+                setError(err.message || "Something went wrong.");
+            }
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -222,8 +230,9 @@ export default function Signup() {
                                             {Array.from({ length: 5 }).map((_, i) => (
                                                 <div
                                                     key={i}
-                                                    className={`h-1 flex-1 rounded-full transition-colors ${i < strength.score ? strength.color : "bg-surface-elevated"
-                                                        }`}
+                                                    className={`h-1 flex-1 rounded-full transition-colors ${
+                                                        i < strength.score ? strength.color : "bg-surface-elevated"
+                                                    }`}
                                                 />
                                             ))}
                                         </div>
@@ -238,8 +247,9 @@ export default function Signup() {
                                 Confirm password
                             </label>
                             <div
-                                className={`flex items-center gap-2.5 rounded-md border bg-void px-3 py-2.5 transition-colors focus-within:border-accent/40 ${form.confirmPassword && !passwordsMatch ? "border-danger/40" : "border-border"
-                                    }`}
+                                className={`flex items-center gap-2.5 rounded-md border bg-void px-3 py-2.5 transition-colors focus-within:border-accent/40 ${
+                                    form.confirmPassword && !passwordsMatch ? "border-danger/40" : "border-border"
+                                }`}
                             >
                                 <TbLock size={15} className="shrink-0 text-text-faint" />
                                 <input
