@@ -57,11 +57,11 @@ Instead of treating a GitHub repository as a collection of files, CodeArchaeolog
   </tr>
   <tr>
     <td width="50%"><img src="screenshots/evolution.png" alt="Evolution"></td>
-    <td width="50%"><img src="screenshots/askCodeArchaeologist.png" alt="Ask CodeArchaeologist"></td>
+    <td width="50%"><img src="screenshots/askCodeArchaelogist.png" alt="Ask CodeArchaeologist"></td>
   </tr>
   <tr>
     <td width="50%"><img src="screenshots/decisionForensics.png" alt="Decision Forensics"></td>
-    <td width="50%"><img src="screenshots/riskImpact.png" alt="Risk Impact"></td>
+    <td width="50%"><img src="screenshots/riskandimpact.png" alt="Risk Impact"></td>
   </tr>
   <tr>
     <td width="50%"><img src="screenshots/overview.png" alt="Overview"></td>
@@ -137,6 +137,7 @@ CodeArchaeologist investigates the repository to reconstruct that missing contex
 -  Cloud Deployment
 -  Asynchronous Investigation Workflow
 -  Advanced Knowledge Graph
+-  Demo Mode
 ---
 
 #  What Makes CodeArchaeologist Different?
