@@ -1,32 +1,66 @@
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlencode
 from dotenv import load_dotenv
 import json
 import os
+import re
 import subprocess
 import tempfile
+import time
 import urllib.error
 import urllib.request
 
-load_dotenv()
+
+# ============================================================
+# ENVIRONMENT
+# ============================================================
+
+BASE_DIR = Path(__file__).resolve().parents[2]
+ENV_FILE = BASE_DIR / ".env"
+
+load_dotenv(dotenv_path=ENV_FILE)
+
 
 GITHUB_API_BASE = "https://api.github.com"
 
+GITHUB_TIMEOUT = int(
+    os.getenv("GITHUB_API_TIMEOUT", "30")
+)
+
+GITHUB_RETRIES = int(
+    os.getenv("GITHUB_API_RETRIES", "2")
+)
+
+
+# ============================================================
+# GITHUB URL PARSING
+# ============================================================
 
 def parse_github_url(repo_url: str):
-    """Extract owner and repository name from a GitHub URL."""
+    """
+    Extract owner and repository name from a GitHub URL.
+    """
 
-    parsed = urlparse(repo_url)
+    if not repo_url:
+        raise ValueError(
+            "GitHub repository URL is required."
+        )
 
-    if parsed.netloc.lower() not in [
+    parsed = urlparse(repo_url.strip())
+
+    if parsed.netloc.lower() not in {
         "github.com",
-        "www.github.com"
-    ]:
+        "www.github.com",
+    }:
         raise ValueError(
             "Only GitHub repository URLs are supported."
         )
 
-    parts = parsed.path.strip("/").split("/")
+    parts = [
+        part
+        for part in parsed.path.strip("/").split("/")
+        if part
+    ]
 
     if len(parts) < 2:
         raise ValueError(
@@ -41,13 +75,20 @@ def parse_github_url(repo_url: str):
 
     return {
         "owner": owner,
-        "repo": repo
+        "repo": repo,
     }
 
+
+# ============================================================
+# REPOSITORY CLONING
+# ============================================================
 
 def clone_repository(repo_url: str):
     """
     Clone a GitHub repository into a temporary directory.
+
+    This uses git directly and does not depend on the
+    GitHub REST API.
     """
 
     repository = parse_github_url(repo_url)
@@ -55,46 +96,63 @@ def clone_repository(repo_url: str):
     temp_directory = tempfile.mkdtemp(
         prefix="codearchaeologist_"
     )
-    result = subprocess.run(
-    [
-        "git",
-        "-c",
-        "credential.helper=manager",
-        "clone",
-        "--depth",
-        "100",
-        repo_url,
-        temp_directory
-    ],
-    capture_output=True,
-    text=True
-)
-    if result.returncode != 0:
+
+    try:
+
+        result = subprocess.run(
+            [
+                "git",
+                "-c",
+                "credential.helper=manager",
+                "clone",
+                "--depth",
+                "100",
+                repo_url,
+                temp_directory,
+            ],
+            capture_output=True,
+            text=True,
+            timeout=180,
+        )
+
+    except subprocess.TimeoutExpired:
+
         raise RuntimeError(
-            f"Failed to clone repository: {result.stderr}"
+            "GitHub repository cloning timed out."
+        )
+
+    if result.returncode != 0:
+
+        stderr = (
+            result.stderr.strip()
+            or "Unknown git clone error."
+        )
+
+        raise RuntimeError(
+            f"Failed to clone repository: {stderr}"
         )
 
     return {
         "owner": repository["owner"],
         "repo": repository["repo"],
-        "path": temp_directory
+        "path": temp_directory,
     }
 
 
 # ============================================================
-# GitHub API
+# GITHUB API
 # ============================================================
 
 def github_api_request(
     endpoint: str,
-    params: dict | None = None
+    params: dict | None = None,
 ):
     """
     Make a request to the GitHub REST API.
 
-    A GITHUB_TOKEN can be supplied through the environment.
-    Public repositories can also be accessed without a token,
-    subject to GitHub API rate limits.
+    Public repositories can be accessed without a token,
+    but supplying GITHUB_TOKEN is strongly recommended because
+    unauthenticated GitHub API requests have stricter rate limits.
     """
 
     token = os.getenv("GITHUB_TOKEN")
@@ -102,87 +160,160 @@ def github_api_request(
     url = f"{GITHUB_API_BASE}{endpoint}"
 
     if params:
-        query = "&".join(
-            f"{key}={value}"
-            for key, value in params.items()
-        )
 
-        url = f"{url}?{query}"
+        clean_params = {
+            key: value
+            for key, value in params.items()
+            if value is not None
+        }
+
+        if clean_params:
+
+            url = (
+                f"{url}?"
+                f"{urlencode(clean_params)}"
+            )
 
     headers = {
         "Accept": "application/vnd.github+json",
         "X-GitHub-Api-Version": "2022-11-28",
-        "User-Agent": "CodeArchaeologist"
+        "User-Agent": "CodeArchaeologist-AI",
     }
 
     if token:
-        headers["Authorization"] = f"Bearer {token}"
+
+        headers["Authorization"] = (
+            f"Bearer {token}"
+        )
 
     request = urllib.request.Request(
         url,
         headers=headers,
-        method="GET"
+        method="GET",
     )
 
-    try:
+    last_error = None
 
-        with urllib.request.urlopen(
-            request,
-            timeout=20
-        ) as response:
+    for attempt in range(
+        GITHUB_RETRIES + 1
+    ):
 
-            data = response.read().decode(
-                "utf-8"
+        try:
+
+            with urllib.request.urlopen(
+                request,
+                timeout=GITHUB_TIMEOUT,
+            ) as response:
+
+                data = response.read().decode(
+                    "utf-8"
+                )
+
+                return json.loads(data)
+
+        except urllib.error.HTTPError as error:
+
+            error_body = error.read().decode(
+                "utf-8",
+                errors="replace",
             )
 
-            return json.loads(data)
+            last_error = (
+                f"GitHub API request failed "
+                f"({error.code}): {error_body}"
+            )
 
-    except urllib.error.HTTPError as error:
+            # Retry only transient server errors.
+            if error.code in {
+                502,
+                503,
+                504,
+            } and attempt < GITHUB_RETRIES:
 
-        error_body = error.read().decode(
-            "utf-8",
-            errors="replace"
-        )
+                time.sleep(
+                    1.5 * (attempt + 1)
+                )
 
-        raise RuntimeError(
-            f"GitHub API request failed "
-            f"({error.code}): {error_body}"
-        )
+                continue
 
-    except urllib.error.URLError as error:
+            raise RuntimeError(
+                last_error
+            )
 
-        raise RuntimeError(
-            f"GitHub API connection failed: {error}"
-        )
+        except urllib.error.URLError as error:
 
+            last_error = (
+                f"GitHub API connection failed: "
+                f"{error}"
+            )
+
+            if attempt < GITHUB_RETRIES:
+
+                time.sleep(
+                    1.5 * (attempt + 1)
+                )
+
+                continue
+
+            raise RuntimeError(
+                last_error
+            )
+
+        except TimeoutError:
+
+            last_error = (
+                "GitHub API request timed out."
+            )
+
+            if attempt < GITHUB_RETRIES:
+
+                time.sleep(
+                    1.5 * (attempt + 1)
+                )
+
+                continue
+
+            raise RuntimeError(
+                last_error
+            )
+
+        except json.JSONDecodeError:
+
+            raise RuntimeError(
+                "GitHub API returned invalid JSON."
+            )
+
+    raise RuntimeError(
+        last_error
+        or "GitHub API request failed."
+    )
+
+
+# ============================================================
+# PULL REQUESTS
+# ============================================================
 
 def get_repository_pull_requests(
     owner: str,
     repo: str,
     state: str = "all",
-    per_page: int = 30
+    per_page: int = 30,
 ):
-    """
-    Fetch pull requests for a repository.
-    """
 
     return github_api_request(
         f"/repos/{owner}/{repo}/pulls",
         {
             "state": state,
-            "per_page": per_page
-        }
+            "per_page": per_page,
+        },
     )
 
 
 def get_pull_request(
     owner: str,
     repo: str,
-    pull_number: int
+    pull_number: int,
 ):
-    """
-    Fetch detailed information about a pull request.
-    """
 
     return github_api_request(
         f"/repos/{owner}/{repo}/pulls/{pull_number}"
@@ -193,17 +324,15 @@ def get_pull_request_comments(
     owner: str,
     repo: str,
     pull_number: int,
-    per_page: int = 100
+    per_page: int = 100,
 ):
-    """
-    Fetch review comments attached to a pull request.
-    """
 
     return github_api_request(
-        f"/repos/{owner}/{repo}/pulls/{pull_number}/comments",
+        f"/repos/{owner}/{repo}/pulls/"
+        f"{pull_number}/comments",
         {
-            "per_page": per_page
-        }
+            "per_page": per_page,
+        },
     )
 
 
@@ -211,31 +340,31 @@ def get_pull_request_reviews(
     owner: str,
     repo: str,
     pull_number: int,
-    per_page: int = 100
+    per_page: int = 100,
 ):
-    """
-    Fetch pull request reviews.
-    """
 
     return github_api_request(
-        f"/repos/{owner}/{repo}/pulls/{pull_number}/reviews",
+        f"/repos/{owner}/{repo}/pulls/"
+        f"{pull_number}/reviews",
         {
-            "per_page": per_page
-        }
+            "per_page": per_page,
+        },
     )
 
+
+# ============================================================
+# ISSUES
+# ============================================================
 
 def get_issue(
     owner: str,
     repo: str,
-    issue_number: int
+    issue_number: int,
 ):
-    """
-    Fetch a GitHub issue.
-    """
 
     return github_api_request(
-        f"/repos/{owner}/{repo}/issues/{issue_number}"
+        f"/repos/{owner}/{repo}/issues/"
+        f"{issue_number}"
     )
 
 
@@ -243,57 +372,48 @@ def get_issue_comments(
     owner: str,
     repo: str,
     issue_number: int,
-    per_page: int = 100
+    per_page: int = 100,
 ):
-    """
-    Fetch comments belonging to a GitHub issue.
-    """
 
     return github_api_request(
-        f"/repos/{owner}/{repo}/issues/{issue_number}/comments",
+        f"/repos/{owner}/{repo}/issues/"
+        f"{issue_number}/comments",
         {
-            "per_page": per_page
-        }
+            "per_page": per_page,
+        },
     )
 
+
+# ============================================================
+# COMMIT → PULL REQUESTS
+# ============================================================
 
 def get_commit_pull_requests(
     owner: str,
     repo: str,
-    commit_hash: str
+    commit_hash: str,
 ):
-    """
-    Find pull requests associated with a specific commit.
-    """
 
     return github_api_request(
-        f"/repos/{owner}/{repo}/commits/{commit_hash}/pulls"
+        f"/repos/{owner}/{repo}/commits/"
+        f"{commit_hash}/pulls"
     )
 
 
+# ============================================================
+# ISSUE EXTRACTION
+# ============================================================
+
 def extract_issue_numbers_from_text(
-    text: str | None
+    text: str | None,
 ):
-    """
-    Extract simple GitHub issue references such as:
-
-        #123
-        owner/repo#123
-
-    from PR descriptions or comments.
-
-    This is evidence discovery, not proof that an issue
-    is formally linked to the change.
-    """
-
-    import re
 
     if not text:
         return []
 
     matches = re.findall(
         r"(?<!\w)#(\d+)",
-        text
+        text,
     )
 
     return sorted(
@@ -304,34 +424,40 @@ def extract_issue_numbers_from_text(
     )
 
 
+# ============================================================
+# GITHUB INVESTIGATION HISTORY
+# ============================================================
+
 def investigate_github_history(
     owner: str,
     repo: str,
-    commit_hash: str
+    commit_hash: str,
 ):
     """
-    Gather GitHub collaboration evidence for a commit.
+    Gather GitHub collaboration evidence associated
+    with a specific commit.
 
-    Flow:
-
-        Commit
-          ↓
-        Pull Requests
-          ↓
-        PR details
-          ↓
-        PR comments/reviews
-          ↓
-        Issue references
-          ↓
-        Issue details/comments
+    GitHub evidence is supplementary. A temporary GitHub
+    API failure should not destroy the repository analysis.
     """
 
-    pull_requests = get_commit_pull_requests(
-        owner,
-        repo,
-        commit_hash
-    )
+    try:
+
+        pull_requests = get_commit_pull_requests(
+            owner,
+            repo,
+            commit_hash,
+        )
+
+    except RuntimeError as error:
+
+        return {
+            "commit": commit_hash,
+            "pull_requests": [],
+            "total_pull_requests": 0,
+            "status": "unavailable",
+            "error": str(error),
+        }
 
     investigations = []
 
@@ -344,23 +470,41 @@ def investigate_github_history(
         if not pull_number:
             continue
 
-        details = get_pull_request(
-            owner,
-            repo,
-            pull_number
-        )
+        try:
 
-        comments = get_pull_request_comments(
-            owner,
-            repo,
-            pull_number
-        )
+            details = get_pull_request(
+                owner,
+                repo,
+                pull_number,
+            )
 
-        reviews = get_pull_request_reviews(
-            owner,
-            repo,
-            pull_number
-        )
+            comments = get_pull_request_comments(
+                owner,
+                repo,
+                pull_number,
+            )
+
+            reviews = get_pull_request_reviews(
+                owner,
+                repo,
+                pull_number,
+            )
+
+        except RuntimeError as error:
+
+            investigations.append(
+                {
+                    "pull_request": pull_request,
+                    "details": None,
+                    "comments": [],
+                    "reviews": [],
+                    "referenced_issues": [],
+                    "status": "partial",
+                    "error": str(error),
+                }
+            )
+
+            continue
 
         issue_numbers = (
             extract_issue_numbers_from_text(
@@ -370,37 +514,40 @@ def investigate_github_history(
 
         issues = []
 
-        for issue_number in issue_numbers:
+        # Limit issue traversal so one PR cannot
+        # generate an excessive number of requests.
+        for issue_number in issue_numbers[:5]:
 
             try:
 
                 issue = get_issue(
                     owner,
                     repo,
-                    issue_number
+                    issue_number,
                 )
 
                 issue_comments = (
                     get_issue_comments(
                         owner,
                         repo,
-                        issue_number
+                        issue_number,
                     )
                 )
 
                 issues.append(
                     {
                         "issue": issue,
-                        "comments": issue_comments
+                        "comments": issue_comments,
                     }
                 )
 
-            except RuntimeError:
+            except RuntimeError as error:
 
                 issues.append(
                     {
                         "issue_number": issue_number,
-                        "status": "unavailable"
+                        "status": "unavailable",
+                        "error": str(error),
                     }
                 )
 
@@ -409,7 +556,8 @@ def investigate_github_history(
                 "pull_request": details,
                 "comments": comments,
                 "reviews": reviews,
-                "referenced_issues": issues
+                "referenced_issues": issues,
+                "status": "complete",
             }
         )
 
@@ -418,5 +566,6 @@ def investigate_github_history(
         "pull_requests": investigations,
         "total_pull_requests": len(
             investigations
-        )
+        ),
+        "status": "complete",
     }
