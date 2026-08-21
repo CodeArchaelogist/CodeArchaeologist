@@ -1,14 +1,7 @@
-<<<<<<< HEAD
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { TbUser, TbMail, TbLock, TbArrowRight } from "react-icons/tb";
-import BackButton from "../components/ui/BackButton.jsx";
-=======
 import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { TbEye, TbEyeOff, TbArrowRight, TbUser, TbMail, TbLock, TbAlertTriangle, TbCheck } from "react-icons/tb";
->>>>>>> ab7544e (Add login signup and profile pages)
 import Button from "../components/ui/Button.jsx";
 import ThemeToggle from "../components/ui/ThemeToggle.jsx";
 import { signup } from "../services/api.js";
@@ -76,13 +69,8 @@ export default function Signup() {
         }
         setError("");
         try {
-<<<<<<< HEAD
-            await signup({ name, email, password });
-            navigate("/dashboard/inv_8f3a2c");
-=======
             await signup({ name: form.name, email: form.email, password: form.password });
             navigate("/analyze", { replace: true });
->>>>>>> ab7544e (Add login signup and profile pages)
         } catch (err) {
             setError(err.message || "Something went wrong.");
         }

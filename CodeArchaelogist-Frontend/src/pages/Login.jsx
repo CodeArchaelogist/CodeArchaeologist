@@ -1,13 +1,7 @@
 import { useState } from "react";
-<<<<<<< HEAD
-import { useNavigate } from "react-router-dom";
-import { TbMail, TbLock, TbArrowRight } from "react-icons/tb";
-import BackButton from "../components/ui/BackButton.jsx";
-=======
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { TbEye, TbEyeOff, TbArrowRight, TbMail, TbLock, TbAlertTriangle } from "react-icons/tb";
->>>>>>> ab7544e (Add login signup and profile pages)
 import Button from "../components/ui/Button.jsx";
 import ThemeToggle from "../components/ui/ThemeToggle.jsx";
 import { login } from "../services/api.js";
