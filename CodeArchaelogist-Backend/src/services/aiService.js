@@ -1,18 +1,27 @@
 import dotenv from "dotenv";
-dotenv.config();
 import axios from "axios";
+
+dotenv.config();
 
 export async function analyzeCommit({
     repo_url,
     commit_hash,
     question,
 }) {
-    const aiServiceUrl =
-        process.env.AI_SERVICE_URL ;
+    const aiServiceUrl = process.env.AI_SERVICE_URL;
+
+    if (!aiServiceUrl) {
+        const error = new Error(
+            "AI_SERVICE_URL is not configured."
+        );
+
+        error.statusCode = 500;
+        throw error;
+    }
 
     try {
         const response = await axios.post(
-            `${aiServiceUrl}/analyze`,
+            `${aiServiceUrl.replace(/\/$/, "")}/analyze`,
             {
                 repo_url,
                 commit_hash,
@@ -28,6 +37,12 @@ export async function analyzeCommit({
 
         return response.data;
     } catch (error) {
+        console.error(
+            "AI SERVICE ERROR:",
+            error.response?.data || error.message
+        );
+
+        // AI service is not running / unreachable
         if (
             error.code === "ECONNREFUSED" ||
             error.code === "ECONNABORTED" ||
@@ -38,10 +53,10 @@ export async function analyzeCommit({
             );
 
             err.statusCode = 503;
-
             throw err;
         }
 
+        // AI service itself returned an error
         if (error.response) {
             const err = new Error(
                 error.response.data?.detail ||
@@ -62,7 +77,6 @@ export async function analyzeCommit({
         );
 
         err.statusCode = 502;
-
         throw err;
     }
 }
