@@ -73,13 +73,6 @@ export default function Landing() {
                             <Button size="lg" icon={TbArrowRight} iconPosition="right" onClick={() => navigate("/analyze")}>
                                 Investigate a Repository
                             </Button>
-                            <Button
-                                variant="secondary"
-                                size="lg"
-                                onClick={() => navigate("/dashboard/inv_8f3a2c")}
-                            >
-                                Explore Demo
-                            </Button>
                         </div>
                     </motion.div>
 

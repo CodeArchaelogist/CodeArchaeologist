@@ -22,13 +22,13 @@ const isDemoMode = () => localStorage.getItem('DEMO_MODE') !== 'false';
 export async function getInvestigation(id) {
     await delay();
     if (isDemoMode()) return { id, repository, agentPipeline, investigationLog };
-    
+
     // Live Mode Empty State
-    return { 
-        id, 
-        repository: { name: "No Data", owner: "Live API Active", files: [] }, 
-        agentPipeline: [], 
-        investigationLog: [] 
+    return {
+        id,
+        repository: { name: "No Data", owner: "Live API Active", files: [] },
+        agentPipeline: [],
+        investigationLog: []
     };
 }
 
@@ -36,11 +36,11 @@ export async function getInvestigation(id) {
 export async function getRepository(id) {
     await delay();
     if (isDemoMode()) return repository;
-    
+
     // Live Mode Empty State
-    return { 
-        name: "Live Mode Active", 
-        owner: "No Mock Data", 
+    return {
+        name: "Live Mode Active",
+        owner: "No Mock Data",
         description: "Connect the backend AI service to see real repository data.",
         files: []
     };
@@ -50,7 +50,7 @@ export async function getRepository(id) {
 export async function getArchitecture(id) {
     await delay();
     if (isDemoMode()) return { architecture, dependencyGraph, nodeDetails };
-    
+
     // Live Mode Empty State
     return { architecture: [], dependencyGraph: { nodes: [], links: [] }, nodeDetails: {} };
 }
@@ -86,7 +86,7 @@ export async function getRecentRepositories() {
 // POST /api/investigations/:id/questions
 export async function askArchaeologist(id, question, repoUrl, commitHash) {
     await delay(700);
-    
+
     if (isDemoMode()) {
         console.warn("DEMO MODE: Using mock data for Ask Archaeologist");
         return (

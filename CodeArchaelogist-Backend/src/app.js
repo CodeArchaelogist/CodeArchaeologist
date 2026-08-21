@@ -1,20 +1,57 @@
-import express from "express"
-import cookieParser from "cookie-parser"
-import cors from "cors"
+import express from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import dotenv from "dotenv";
 
-const app = express()
+import authRoutes from "./routes/authRoutes.js";
+import investigationRoutes from "./routes/investigationRoutes.js";
 
-app.use(cors({
-    origin: process.env.CORS_ORIGIN,
-    credentials: true,
-}))
-app.use(express.json({ limit: "16kB" }))
-app.use(express.urlencoded({ extended: true, limit: "16kb" }))
-app.use(express.static("public"))
-app.use(cookieParser())
+import {
+    notFound,
+    errorHandler,
+} from "./middleware/errorMiddleware.js";
 
-//routes import
+dotenv.config();
 
-//routes declaration
+export const app = express();
 
-export { app };
+app.disable("x-powered-by");
+
+app.use(
+    cors({
+        origin:
+            process.env.FRONTEND_URL ||
+            "http://localhost:5173",
+
+        credentials: true,
+    })
+);
+
+app.use(
+    express.json({
+        limit: "1mb",
+    })
+);
+
+app.use(cookieParser());
+
+app.get("/api/health", (req, res) => {
+    res.status(200).json({
+        status: "ok",
+        service: "CodeArchaeologist Backend",
+    });
+});
+
+app.use(
+    "/api/auth",
+    authRoutes
+);
+
+app.use(
+    "/api/investigations",
+    investigationRoutes
+);
+
+app.use(notFound);
+
+app.use(errorHandler);
