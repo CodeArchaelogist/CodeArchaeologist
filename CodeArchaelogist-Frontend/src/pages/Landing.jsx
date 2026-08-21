@@ -21,6 +21,23 @@ const agents = [
     { name: "Reasoning Agent", desc: "Synthesizes evidence into historical intent." },
 ];
 
+const howItWorksSteps = [
+    { title: "Repository", desc: "Connect your GitHub repository to begin a deep-dive analysis of your historical code architecture." },
+    { title: "Agents", desc: "Deploy specialized AI agents to autonomously crawl commits, parse ASTs, and map out dependency trees." },
+    { title: "Evidence", desc: "Extract and cross-reference commits, pull requests, and closed issues to build a factual foundation." },
+    { title: "Reasoning", desc: "Synthesize the gathered evidence to reconstruct the historical intent and engineering trade-offs." },
+    { title: "Insight", desc: "Generate actionable architecture decision records and expose hidden technical debt." }
+];
+
+const features = [
+    { title: "Risk Detection", desc: "Identify orphaned code, technical debt, and high-risk dependency chains automatically." },
+    { title: "Timeline Scrubbing", desc: "Rewind repository history to see exactly when and why an architectural shift occurred." },
+    { title: "Retroactive ADRs", desc: "Generate Architecture Decision Records instantly for undocumented legacy systems." },
+    { title: "Impact Analysis", desc: "Map how a single historical pull request rippled across the entire codebase." },
+    { title: "Contextual Search", desc: "Query your codebase using natural language to find the historical intent behind weird code." },
+    { title: "Knowledge Graph", desc: "Visualize the invisible connections between past developers, closed issues, and current modules." }
+];
+
 export default function Landing() {
     const navigate = useNavigate();
     const [isDemoMode, setIsDemoMode] = useState(true);
@@ -170,10 +187,16 @@ export default function Landing() {
                         <p className="font-mono text-[11px] uppercase tracking-widest text-accent">How it works</p>
                         <h2 className="mt-3 text-2xl font-semibold text-text-primary">One continuous investigation.</h2>
                         <div className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-5">
-                            {["Repository", "Agents", "Evidence", "Reasoning", "Insight"].map((step, i) => (
-                                <div key={step} className="rounded-lg border border-border bg-surface p-4">
+                            {howItWorksSteps.map((step, i) => (
+                                <div
+                                    key={step.title}
+                                    className="group rounded-lg border border-border bg-surface p-4 transition-all duration-300 hover:-translate-y-1.5 hover:border-accent/50 hover:bg-surface-elevated hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)]"
+                                >
                                     <span className="font-mono text-[11px] text-text-faint">{String(i + 1).padStart(2, "0")}</span>
-                                    <p className="mt-2 text-sm font-medium text-text-primary">{step}</p>
+                                    <p className="mt-2 text-sm font-medium text-text-primary">{step.title}</p>
+                                    <p className="mt-1 text-xs text-text-muted opacity-0 group-hover:opacity-100 transition-opacity">
+                                        {step.desc}
+                                    </p>
                                 </div>
                             ))}
                         </div>
@@ -191,41 +214,33 @@ export default function Landing() {
                         </h2>
                         <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                             {agents.map((agent) => (
-                                <div key={agent.name} className="rounded-lg border border-border bg-surface p-5">
+                                <div
+                                    key={agent.name}
+                                    className="group rounded-lg border border-border bg-surface p-5 cursor-default transition-all duration-300 hover:-translate-y-1.5 hover:border-accent/50 hover:bg-surface-elevated hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)]"
+                                >
                                     <p className="text-sm font-medium text-text-primary">{agent.name}</p>
-                                    <p className="mt-2 text-xs leading-relaxed text-text-muted">{agent.desc}</p>
+                                    <p className="mt-2 text-xs leading-relaxed text-text-muted opacity-0 group-hover:opacity-100 transition-opacity">{agent.desc}</p>
                                 </div>
                             ))}
                         </div>
                     </div>
                 </section>
 
-                {/* Decision Forensics preview */}
-                <section className="border-t border-border-subtle bg-surface/40 px-6 py-20">
-                    <div className="mx-auto max-w-4xl">
-                        <p className="font-mono text-[11px] uppercase tracking-widest text-evidence">
-                            Decision forensics
-                        </p>
-                        <h2 className="mt-3 text-2xl font-semibold text-text-primary">
-                            Reconstruct the reasoning behind the code.
-                        </h2>
-                        <div className="mt-8 rounded-xl border border-border bg-surface p-6">
-                            <p className="font-mono text-xs text-text-faint">PaymentService</p>
-                            <p className="mt-2 text-base font-medium text-text-primary">
-                                Why does PaymentService still use LegacyPaymentFallback?
-                            </p>
-                            <p className="mt-4 text-sm leading-relaxed text-text-muted">
-                                LegacyPaymentFallback was introduced during the 2021 payment-provider migration to
-                                handle timeout failures.
-                            </p>
-                            <div className="mt-5 flex flex-wrap gap-3 font-mono text-[11px] text-text-faint">
-                                <span className="rounded border border-border px-2 py-1">Commit a81f2e9</span>
-                                <span className="rounded border border-border px-2 py-1">PR #142</span>
-                                <span className="rounded border border-border px-2 py-1">Issue #89</span>
-                                <span className="rounded border border-success/30 bg-success/10 px-2 py-1 text-success">
-                                    91% confidence
-                                </span>
-                            </div>
+                {/* Core Capabilities */}
+                <section className="px-6 py-20">
+                    <div className="mx-auto max-w-6xl">
+                        <p className="font-mono text-[11px] uppercase tracking-widest text-accent">Capabilities</p>
+                        <h2 className="mt-3 text-2xl font-semibold text-text-primary">Everything you need to decipher legacy systems.</h2>
+                        <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                            {features.map((feature) => (
+                                <div
+                                    key={feature.title}
+                                    className="group rounded-lg border border-border bg-surface/50 p-6 transition-all duration-300 hover:-translate-y-1.5 hover:border-accent/50 hover:bg-surface-elevated hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)]"
+                                >
+                                    <p className="text-base font-medium text-text-primary">{feature.title}</p>
+                                    <p className="mt-2 text-sm leading-relaxed text-text-muted opacity-0 group-hover:opacity-100 transition-opacity">{feature.desc}</p>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </section>
