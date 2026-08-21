@@ -7,7 +7,7 @@ const typeConfig = {
 };
 
 export default function EvidenceCard({ evidence, onClick }) {
-    const config = typeConfig[evidence.type] || typeConfig.commit;
+    const config = typeConfig[evidence?.type] || typeConfig.commit;
     const Icon = config.icon;
 
     return (
@@ -17,9 +17,9 @@ export default function EvidenceCard({ evidence, onClick }) {
         >
             <Icon size={15} className={config.color} />
             <div className="min-w-0 flex-1">
-                <p className="truncate text-xs text-text-primary">{evidence.label}</p>
+                <p className="truncate text-xs text-text-primary">{evidence?.label}</p>
             </div>
-            <span className="font-mono text-[10px] text-text-faint">{evidence.ref}</span>
+            <span className="font-mono text-[10px] text-text-faint">{evidence?.ref}</span>
         </button>
     );
 }

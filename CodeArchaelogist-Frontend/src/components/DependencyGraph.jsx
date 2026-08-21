@@ -10,8 +10,8 @@ function layoutNodes(nodes, width, height) {
     const cx = width / 2;
     const cy = height / 2;
     const r = Math.min(width, height) / 2 - 60;
-    return nodes.map((node, i) => {
-        const angle = (i / nodes.length) * Math.PI * 2 - Math.PI / 2;
+    return (nodes || []).map((node, i) => {
+        const angle = (i / (nodes || []).length) * Math.PI * 2 - Math.PI / 2;
         return { ...node, x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle) };
     });
 }
@@ -19,19 +19,19 @@ function layoutNodes(nodes, width, height) {
 export default function DependencyGraph({ graph, nodeDetails, onSelectNode }) {
     const width = 640;
     const height = 420;
-    const positioned = useMemo(() => layoutNodes(graph.nodes, width, height), [graph.nodes]);
+    const positioned = useMemo(() => layoutNodes(graph?.nodes, width, height), [graph?.nodes]);
     const [hovered, setHovered] = useState(null);
 
-    const findNode = (id) => positioned.find((n) => n.id === id);
+    const findNode = (id) => (positioned || []).find((n) => n?.id === id);
 
     return (
         <div className="rounded-lg border border-border bg-surface p-4">
             <svg viewBox={`0 0 ${width} ${height}`} className="h-auto w-full">
-                {graph.edges.map((edge, i) => {
-                    const s = findNode(edge.source);
-                    const t = findNode(edge.target);
+                {(graph?.edges || []).map((edge, i) => {
+                    const s = findNode(edge?.source);
+                    const t = findNode(edge?.target);
                     if (!s || !t) return null;
-                    const isActive = hovered === edge.source || hovered === edge.target;
+                    const isActive = hovered === edge?.source || hovered === edge?.target;
                     return (
                         <line
                             key={i}
@@ -45,7 +45,7 @@ export default function DependencyGraph({ graph, nodeDetails, onSelectNode }) {
                     );
                 })}
 
-                {positioned.map((node) => (
+                {(positioned || []).map((node) => (
                     <g
                         key={node.id}
                         transform={`translate(${node.x}, ${node.y})`}

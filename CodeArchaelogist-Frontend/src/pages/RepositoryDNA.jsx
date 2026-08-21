@@ -18,17 +18,22 @@ export default function RepositoryDNA() {
     if (!data) return <LoadingState />;
 
     const { architecture, dependencyGraph, nodeDetails } = data;
-    const detail = nodeDetails[selectedNode];
+
+    if (!architecture || Array.isArray(architecture) || Object.keys(architecture).length === 0) {
+        return <div className="text-center py-12 text-text-muted">No architecture data available.</div>;
+    }
+
+    const detail = nodeDetails?.[selectedNode];
 
     return (
         <div className="flex flex-col gap-8 pb-16">
             <PageHeader eyebrow="Repository DNA" title="What this repository is made of" />
 
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                <InfoBlock label="Architecture" value={architecture.style} />
-                <InfoBlock label="Size" value={architecture.size} />
-                <InfoBlock label="Stack" value={architecture.framework} />
-                <InfoBlock label="Entry points" value={architecture.entryPoints.join(", ")} mono />
+                <InfoBlock label="Architecture" value={architecture?.style} />
+                <InfoBlock label="Size" value={architecture?.size} />
+                <InfoBlock label="Stack" value={architecture?.framework} />
+                <InfoBlock label="Entry points" value={(architecture?.entryPoints || []).join(", ")} mono />
             </div>
 
             <div>
@@ -43,16 +48,16 @@ export default function RepositoryDNA() {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-border-subtle">
-                            {architecture.keyModules.map((mod) => (
+                            {(architecture?.keyModules || []).map((mod) => (
                                 <tr
-                                    key={mod.name}
+                                    key={mod?.name}
                                     className="cursor-pointer bg-surface hover:bg-surface-elevated/60"
-                                    onClick={() => setSelectedNode(mod.name)}
+                                    onClick={() => setSelectedNode(mod?.name)}
                                 >
-                                    <td className="px-4 py-2.5 font-mono text-text-primary">{mod.name}</td>
-                                    <td className="px-4 py-2.5 text-text-muted">{mod.files}</td>
+                                    <td className="px-4 py-2.5 font-mono text-text-primary">{mod?.name}</td>
+                                    <td className="px-4 py-2.5 text-text-muted">{mod?.files}</td>
                                     <td className="px-4 py-2.5">
-                                        <StatusBadge label={mod.risk} tone={mod.risk} />
+                                        <StatusBadge label={mod?.risk} tone={mod?.risk} />
                                     </td>
                                 </tr>
                             ))}

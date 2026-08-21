@@ -6,9 +6,9 @@ export default function Timeline({ events }) {
         <div className="relative pl-6">
             <div className="evidence-trail absolute left-[7px] top-1 bottom-1 w-px" />
             <div className="flex flex-col gap-6">
-                {events.map((event, i) => (
+                {(events || []).map((event, i) => (
                     <motion.div
-                        key={event.id}
+                        key={event?.id}
                         initial={{ opacity: 0, x: -8 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true, margin: "-40px" }}
