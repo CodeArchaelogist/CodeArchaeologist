@@ -112,6 +112,7 @@ export async function signup(req, res, next) {
 
 export async function login(req, res, next) {
     try {
+        console.log("LOGIN BODY:", req.body);
         const {
             email,
             password,

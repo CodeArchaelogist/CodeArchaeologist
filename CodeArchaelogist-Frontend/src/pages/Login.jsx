@@ -5,6 +5,7 @@ import { TbEye, TbEyeOff, TbArrowRight, TbMail, TbLock, TbAlertTriangle } from "
 import Button from "../components/ui/Button.jsx";
 import ThemeToggle from "../components/ui/ThemeToggle.jsx";
 import { login } from "../services/api.js";
+import BackButton from "../components/ui/BackButton.jsx";
 
 export default function Login() {
     const [email, setEmail] = useState("");
@@ -24,18 +25,38 @@ export default function Login() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError("");
+        setError(null);
+        const formData = new FormData(e.currentTarget);
+
+        const email = formData.get("email")?.toString().trim() || "";
+        const password = formData.get("password")?.toString() || "";
+
+        if (!email || !password) {
+            setError("Please enter both email and password.");
+            return;
+        }
+
+        setLoading(true);
+
         try {
-            await login({ email, password });
-            navigate("/dashboard/inv_8f3a2c");
+            await login({
+                email,
+                password,
+            });
+
+            navigate(redirectTo, { replace: true });
         } catch (err) {
-            setError(err.message || "Something went wrong.");
+            setError(
+                err.message || "Login failed. Please try again."
+            );
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
+        
         <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-void px-6">
-            {/* Ambient backdrop */}
             <div className="pointer-events-none absolute inset-0 overflow-hidden">
                 <div className="absolute -top-32 left-1/2 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-accent/10 blur-[120px]" />
                 <div className="absolute bottom-0 right-0 h-[320px] w-[320px] rounded-full bg-evidence/5 blur-[100px]" />
