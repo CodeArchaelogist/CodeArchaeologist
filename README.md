@@ -44,6 +44,36 @@ Instead of treating a GitHub repository as a collection of files, CodeArchaeolog
 
 ---
 
+## 📸 Screenshots
+
+<table>
+  <tr>
+    <td width="50%"><img src="screenshots/LandingPage-DarkTheme.png" alt="Landing Page Dark Theme"></td>
+    <td width="50%"><img src="screenshots/LandingPage-LightTheme.png" alt="Landing Page Light Theme"></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="screenshots/investigationPage.png" alt="Investigation Page"></td>
+    <td width="50%"><img src="screenshots/repositoryDNA.png" alt="Repository DNA"></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="screenshots/evolution.png" alt="Evolution"></td>
+    <td width="50%"><img src="screenshots/askCodeArchaeologist.png" alt="Ask CodeArchaeologist"></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="screenshots/decisionForensics.png" alt="Decision Forensics"></td>
+    <td width="50%"><img src="screenshots/riskImpact.png" alt="Risk Impact"></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="screenshots/overview.png" alt="Overview"></td>
+    <td width="50%"><img src="screenshots/demoMode.png" alt="Demo Mode"></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="screenshots/login.png" alt="Login"></td>
+    <td width="50%"><img src="screenshots/signup.png" alt="Login"></td>
+  </tr>
+</table>
+
+---
 #  The Problem
 
 When engineers inherit a mature codebase, critical context is often scattered across:
