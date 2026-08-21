@@ -20,6 +20,7 @@ def compact_evidence(evidence: dict, max_chars: int = 18000):
     compact = {
         "history": {},
         "commit_diff": {},
+        "github_history": {},
         "code": [],
         "dependencies": [],
         "impact": {}
@@ -65,6 +66,34 @@ def compact_evidence(evidence: dict, max_chars: int = 18000):
             commit_diff
         )
 
+        # -----------------------------
+    # GitHub collaboration history
+    # -----------------------------
+
+    github_history = evidence.get(
+        "github_history",
+        {}
+    )
+
+    if isinstance(github_history, dict):
+
+        compact["github_history"] = {
+            "commit": github_history.get(
+                "commit"
+            ),
+            "total_pull_requests": github_history.get(
+                "total_pull_requests",
+                0
+            ),
+            "pull_requests": github_history.get(
+                "pull_requests",
+                []
+            )[:5]
+        }
+
+    else:
+
+        compact["github_history"] = github_history
     # -----------------------------
     # Code analysis
     # -----------------------------
@@ -203,24 +232,30 @@ IMPORTANT RULES:
 5. The target commit is the primary subject of this investigation.
 
 6. Use the target commit hash, commit message, changed files,
-   dependencies, impact relationships, and commit diff whenever
-   available.
+   dependencies, impact relationships, commit diff, and GitHub
+   collaboration evidence whenever available.
+7. GitHub collaboration evidence may include pull requests,
+   PR descriptions, review comments, reviews, referenced issues,
+   and issue comments.
 
-7. Do not use an unrelated commit as the primary explanation
+8. Treat GitHub PR/issue information as evidence only when it
+   directly relates to the target commit or the investigated change.
+
+9. Do not use an unrelated commit as the primary explanation
    when a target commit is explicitly provided.
 
-8. Keep the investigation technical and evidence-based.
+10. Keep the investigation technical and evidence-based.
 
-9. Assess risk using the available repository evidence.
+11. Assess risk using the available repository evidence.
 
-10. Consider the following when assessing risk:
+12. Consider the following when assessing risk:
     - number of directly changed files
     - dependency relationships
     - reverse dependency relationships
     - whether core application files are affected
     - whether configuration or infrastructure files are affected
 
-11. Do not assign a high risk simply because many files changed.
+13. Do not assign a high risk simply because many files changed.
     The risk level must be justified by repository evidence.
 
 USER QUESTION:
@@ -276,7 +311,7 @@ Rules for the JSON:
 """
 
     response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model="openai/gpt-oss-120b",
         messages=[
             {
                 "role": "user",
