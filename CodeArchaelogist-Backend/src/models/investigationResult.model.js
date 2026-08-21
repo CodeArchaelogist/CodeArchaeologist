@@ -1,58 +1,69 @@
 import mongoose from "mongoose";
 
-const investigationSchema = new mongoose.Schema(
+const investigationResultSchema = new mongoose.Schema(
     {
-        userId: {
+        investigationId: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
+            ref: "Investigation",
             required: true,
             index: true,
         },
 
-        repositoryId: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Repository",
-            required: true,
-            index: true,
+        historicalIntent: {
+            type: String,
+            default: "",
         },
 
-        commitHash: {
-            type: String,
-            required: true,
-            trim: true,
+        evidence: {
+            type: Array,
+            default: [],
         },
 
-        question: {
-            type: String,
-            required: true,
-            trim: true,
-            maxlength: 500,
+        impact: {
+            type: mongoose.Schema.Types.Mixed,
+            default: [],
         },
 
-        status: {
-            type: String,
-            enum: [
-                "pending",
-                "processing",
-                "complete",
-                "failed",
-            ],
-            default: "pending",
+        risk: {
+            type: mongoose.Schema.Types.Mixed,
+            default: () => ({
+                level: "Medium",
+                reasons: [],
+            }),
         },
 
-        errorMessage: {
+        confidence: {
+            type: mongoose.Schema.Types.Mixed,
+            default: 75,
+        },
+
+        uncertainty: {
+            type: [String],
+            default: [],
+        },
+
+        recommendation: {
             type: String,
-            default: null,
+            default: "",
+        },
+
+        finalAnswer: {
+            type: String,
+            default: "",
+        },
+
+        aiMetadata: {
+            type: mongoose.Schema.Types.Mixed,
+            default: () => ({}),
         },
     },
-
     {
         timestamps: true,
     }
 );
 
-const Investigation =
-    mongoose.models.Investigation ||
-    mongoose.model("Investigation", investigationSchema);
+const InvestigationResult =
+    mongoose.models.InvestigationResult ||
+    mongoose.model("InvestigationResult", investigationResultSchema);
 
-export default Investigation;
+export default InvestigationResult;

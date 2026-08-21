@@ -13,9 +13,6 @@ import {
     recentRepositories,
 } from "../data/mockData.js";
 
-const delay = (ms = 350) =>
-    new Promise((resolve) => setTimeout(resolve, ms));
-
 const isDemoMode = () =>
     localStorage.getItem("DEMO_MODE") !== "false";
 
@@ -23,15 +20,16 @@ const API_BASE_URL =
     import.meta.env.VITE_API_URL ||
     "http://localhost:5000/api";
 
+// Simple in-memory cache to avoid duplicate investigation fetches across tabs
+const investigationCache = new Map();
+
 async function request(endpoint, options = {}) {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         credentials: "include",
-
         headers: {
             "Content-Type": "application/json",
             ...(options.headers || {}),
         },
-
         ...options,
     });
 
@@ -52,6 +50,7 @@ async function request(endpoint, options = {}) {
     return data;
 }
 
+/* ---------------- Authentication ---------------- */
 
 export async function signup(data) {
     return request("/auth/signup", {
@@ -68,6 +67,7 @@ export async function login(data) {
 }
 
 export async function logout() {
+    investigationCache.clear();
     return request("/auth/logout", {
         method: "POST",
     });
@@ -80,39 +80,60 @@ export async function getMe() {
 /* ---------------- Investigations ---------------- */
 
 export async function getInvestigation(id) {
-    await delay();
-
     if (isDemoMode()) {
         return {
             id,
             repository,
             agentPipeline,
             investigationLog,
+            architecture,
+            dependencyGraph,
+            nodeDetails,
+            timelineEvents,
+            decisions,
+            risks,
         };
     }
 
-    return request(`/investigations/${id}`);
+    const data = await request(`/investigations/${id}`);
+    if (data) {
+        investigationCache.set(id, data);
+    }
+    return data;
 }
 
 export async function getRepository(id) {
-    await delay();
-
     if (isDemoMode()) {
         return repository;
     }
 
-    return {
-        name: "Live Mode Active",
-        owner: "No Mock Data",
-        description:
-            "Connect the backend AI service to see real repository data.",
-        files: [],
+    let inv = investigationCache.get(id);
+    if (!inv) {
+        inv = await getInvestigation(id);
+    }
+
+    return inv?.repository || {
+        id,
+        name: "Repository",
+        owner: "Unknown",
+        fullName: "Repository",
+        url: "#",
+        branch: "main",
+        description: "Live investigation data.",
+        lastAnalyzed: new Date().toISOString(),
+        stats: {
+            files: 0,
+            commits: 0,
+            issues: 0,
+            pullRequests: 0,
+            dependencies: 0,
+            riskScore: 0,
+        },
+        languages: [],
     };
 }
 
 export async function getArchitecture(id) {
-    await delay();
-
     if (isDemoMode()) {
         return {
             architecture,
@@ -121,91 +142,117 @@ export async function getArchitecture(id) {
         };
     }
 
+    let inv = investigationCache.get(id);
+    if (!inv) {
+        inv = await getInvestigation(id);
+    }
+
     return {
-        architecture: [],
-        dependencyGraph: {
-            nodes: [],
-            links: [],
+        architecture: inv?.architecture || {
+            style: "Repository Architecture",
+            size: "Analyzed",
+            framework: "JavaScript",
+            entryPoints: [],
+            keyModules: [],
         },
-        nodeDetails: {},
+        dependencyGraph: inv?.dependencyGraph || {
+            nodes: [],
+            edges: [],
+        },
+        nodeDetails: inv?.nodeDetails || {},
     };
 }
 
 export async function getTimeline(id) {
-    await delay();
-
     if (isDemoMode()) {
         return timelineEvents;
     }
 
-    return [];
+    let inv = investigationCache.get(id);
+    if (!inv) {
+        inv = await getInvestigation(id);
+    }
+
+    return inv?.timelineEvents || [];
 }
 
 export async function getDecisions(id) {
-    await delay();
-
     if (isDemoMode()) {
         return decisions;
     }
 
-    return [];
+    let inv = investigationCache.get(id);
+    if (!inv) {
+        inv = await getInvestigation(id);
+    }
+
+    return inv?.decisions || [];
 }
 
 export async function getRisks(id) {
-    await delay();
-
     if (isDemoMode()) {
         return risks;
     }
 
-    return [];
+    let inv = investigationCache.get(id);
+    if (!inv) {
+        inv = await getInvestigation(id);
+    }
+
+    return inv?.risks || [];
 }
 
 export async function getRecentRepositories() {
-    await delay(150);
-
     if (isDemoMode()) {
         return recentRepositories;
     }
 
-    return [];
+    try {
+        const data = await getInvestigations();
+        const list = data?.investigations || data || [];
+
+        const unique = [];
+        const seen = new Set();
+
+        for (const item of list) {
+            const repo = item.repositoryId;
+            if (repo && !seen.has(repo._id || repo.repoUrl)) {
+                seen.add(repo._id || repo.repoUrl);
+                unique.push({
+                    name: repo.repoName,
+                    owner: repo.owner,
+                    url: repo.repoUrl,
+                    investigationId: item._id,
+                    lastAnalyzed: new Date(item.createdAt).toLocaleDateString(),
+                });
+            }
+        }
+
+        return unique.slice(0, 5);
+    } catch {
+        return [];
+    }
 }
 
-export async function askArchaeologist(
-    id,
-    question,
-    repoUrl,
-    commitHash
-) {
-    await delay(700);
-
+export async function askArchaeologist(id, question, repoUrl, commitHash) {
     if (isDemoMode()) {
-        console.warn(
-            "DEMO MODE: Using mock data for Ask Archaeologist"
-        );
-
         return (
             askResponses[question] || {
                 id: "ask_generic",
                 component: "PaymentService",
                 question,
-
                 historicalIntent:
-                    "No direct evidence chain was found for this exact question. Related historical context is shown below based on the closest matching investigation.",
-
+                    "No direct evidence chain was found for this exact question in demo mode.",
                 evidence: [
                     {
                         type: "commit",
                         ref: "a81f2e9",
-                        label:
-                            "Commit a81f2e9 — add legacy fallback handler",
+                        label: "Commit a81f2e9 — add legacy fallback handler",
                     },
                 ],
-
                 affectedModules: 1,
                 confidence: 41,
                 risk: "MEDIUM",
-
                 recommendation:
                     "Refine the question with a specific component or file name for a higher-confidence answer.",
             }
@@ -228,17 +275,28 @@ export function getSuggestedQuestions() {
     }
 
     return [
-        "Backend not connected - switch to Demo Mode",
+        "Why was this commit introduced?",
+        "What components or files are affected by this change?",
+        "What are the potential risks of altering or removing this code?",
+        "What evidence supports the historical reasoning for this implementation?",
     ];
 }
 
-export function createInvestigation(data) {
-    return request("/investigations", {
+export async function createInvestigation(data) {
+    const res = await request("/investigations", {
         method: "POST",
         body: JSON.stringify(data),
     });
+
+    if (res?.investigation?.id) {
+        investigationCache.set(res.investigation.id, res);
+    } else if (res?.id) {
+        investigationCache.set(res.id, res);
+    }
+
+    return res;
 }
 
-export function getInvestigations() {
+export async function getInvestigations() {
     return request("/investigations");
 }
