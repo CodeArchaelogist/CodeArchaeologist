@@ -1,3 +1,6 @@
+import sys
+
+sys.stdout.reconfigure(encoding="utf-8")
 from app.services.github_service import clone_repository
 from app.agents.orchestrator import InvestigationOrchestrator
 
