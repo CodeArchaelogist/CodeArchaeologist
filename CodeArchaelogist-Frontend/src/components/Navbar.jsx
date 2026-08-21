@@ -1,12 +1,31 @@
 import { TbBrandGithub, TbExternalLink, TbMenu2 } from "react-icons/tb";
 import { useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
 import SearchBar from "./SearchBar.jsx";
 import StatusBadge from "./ui/StatusBadge.jsx";
 import ThemeToggle from "./ui/ThemeToggle.jsx";
-import { repository } from "../data/mockData.js";
+// REMOVED the direct mockData import.
+// IMPORT the API function instead:
+import { getRepository } from "../services/api.js";
 
 export default function Navbar({ onMenuClick }) {
     const { id } = useParams();
+    
+    // Add state to hold the data we fetch
+    const [repoData, setRepoData] = useState({ name: "Loading...", url: "#" });
+
+    // Fetch the data through our API layer when the component loads
+    useEffect(() => {
+        async function loadData() {
+            try {
+                const data = await getRepository(id);
+                setRepoData(data);
+            } catch (error) {
+                console.error("Failed to fetch repository for Navbar", error);
+            }
+        }
+        loadData();
+    }, [id]);
 
     return (
         <header className="flex h-14 shrink-0 items-center justify-between border-b border-border bg-void px-4 sm:px-6">
@@ -21,7 +40,8 @@ export default function Navbar({ onMenuClick }) {
                 <div className="hidden items-center gap-2 truncate font-mono text-xs text-text-muted sm:flex">
                     <span className="text-text-faint">investigation</span>
                     <span className="text-text-faint">/</span>
-                    <span className="text-text-primary">{repository.name}</span>
+                    {/* Use the state variable here */}
+                    <span className="text-text-primary">{repoData.name}</span>
                     <span className="text-text-faint">/</span>
                     <span className="text-text-faint">{id}</span>
                 </div>
@@ -31,7 +51,7 @@ export default function Navbar({ onMenuClick }) {
                 <SearchBar className="hidden sm:flex" />
                 <StatusBadge label="Analyzed" tone="complete" className="hidden sm:inline-flex" />
                 <a
-                    href={repository.url}
+                    href={repoData.url || "#"}
                     target="_blank"
                     rel="noreferrer"
                     className="focus-ring flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1.5 text-xs text-text-muted hover:text-text-primary hover:border-accent/40 sm:px-3"

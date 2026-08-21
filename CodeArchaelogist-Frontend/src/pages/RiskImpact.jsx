@@ -40,7 +40,7 @@ export default function RiskImpact() {
             <PageHeader eyebrow="Risk & Impact" title="Where change is dangerous, and why." />
 
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                <MetricCard label="Overall Risk Score" value={repo.stats.riskScore} tone="danger" />
+                <MetricCard label="Overall Risk Score" value={repo?.stats?.riskScore || 0} tone="danger" />
                 <MetricCard label="High-risk Components" value={highCount} tone="danger" />
                 <MetricCard label="Legacy Dependencies" value={risks.filter((r) => r.legacyDependency).length} tone="evidence" />
                 <MetricCard label="Undocumented Areas" value={risks.filter((r) => r.documentationMissing).length} tone="evidence" />

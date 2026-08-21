@@ -23,9 +23,17 @@ const agents = [
 export default function Landing() {
     const navigate = useNavigate();
 
+    // The hidden toggle logic
+    const handleToggleDemo = () => {
+        const currentMode = localStorage.getItem('DEMO_MODE') !== 'false';
+        const newMode = !currentMode;
+        localStorage.setItem('DEMO_MODE', newMode);
+        alert(`Demo Mode is now ${newMode ? 'ON (Mock Data)' : 'OFF (Live API)'}`);
+        window.location.reload();
+    };
+
     return (
         <div className="relative z-10 min-h-screen overflow-hidden text-text-primary">
-
             <div className="relative">
                 {/* Top bar */}
                 <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
@@ -49,7 +57,12 @@ export default function Landing() {
                         <p className="font-mono text-[11px] uppercase tracking-widest text-accent">
                             Engineering intelligence, reconstructed
                         </p>
-                        <h1 className="mt-4 text-4xl font-semibold leading-tight text-text-primary lg:text-5xl">
+                        {/* Hidden Toggle attached here */}
+                        <h1 
+                            onDoubleClick={handleToggleDemo}
+                            title="Double-click to toggle Demo Mode"
+                            className="mt-4 cursor-pointer select-none text-4xl font-semibold leading-tight text-text-primary lg:text-5xl"
+                        >
                             Discover Why Your Code Exists.
                         </h1>
                         <p className="mt-5 max-w-md text-[15px] leading-relaxed text-text-muted">
