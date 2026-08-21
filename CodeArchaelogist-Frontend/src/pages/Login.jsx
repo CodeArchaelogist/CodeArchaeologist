@@ -1,135 +1,83 @@
 import { useState } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
-import { TbEye, TbEyeOff, TbArrowRight } from "react-icons/tb";
+import { useNavigate } from "react-router-dom";
+import { TbMail, TbLock, TbArrowRight } from "react-icons/tb";
+import BackButton from "../components/ui/BackButton.jsx";
 import Button from "../components/ui/Button.jsx";
 import ThemeToggle from "../components/ui/ThemeToggle.jsx";
-import { useAuth } from "../context/AuthContext.jsx";
+import { login } from "../services/api.js";
 
 export default function Login() {
-    const { login } = useAuth();
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
     const navigate = useNavigate();
-    const location = useLocation();
 
-    const [form, setForm] = useState({ email: "", password: "" });
-    const [showPassword, setShowPassword] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-
-    const redirectTo = location.state?.from?.pathname || "/dashboard/inv_8f3a2c";
-
-    const handleChange = (e) => {
-        setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
-    };
-
-    const handleSubmit = async (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
-        setError(null);
-
-        if (!form.email.trim() || !form.password) {
-            setError("Please enter both email and password.");
-            return;
-        }
-
-        setLoading(true);
+        setError("");
         try {
-            await login(form);
-            navigate(redirectTo, { replace: true });
+            await login({ email, password });
+            navigate("/dashboard/inv_8f3a2c");
         } catch (err) {
-            setError(err.message || "Login failed. Please try again.");
-        } finally {
-            setLoading(false);
+            setError(err.message || "Something went wrong.");
         }
     };
 
     return (
-        <div className="relative flex min-h-screen items-center justify-center bg-void px-6">
-            <div className="absolute right-6 top-6">
-                <ThemeToggle />
-            </div>
-
-            <div className="w-full max-w-sm">
-                <div className="mb-8 flex flex-col items-center">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-md bg-accent/10 text-accent">
-                        <span className="font-mono text-sm font-bold">CA</span>
-                    </div>
-                    <p className="mt-3 text-[13px] font-semibold tracking-wide text-text-primary">
-                        CODEARCHAEOLOGIST
-                    </p>
+        <div className="relative z-10 flex min-h-screen items-center justify-center overflow-hidden px-6">
+            <div className="w-full max-w-md">
+                <div className="mb-6 flex items-center justify-between">
+                    <BackButton />
+                    <ThemeToggle />
                 </div>
+                <p className="text-center font-mono text-[11px] uppercase tracking-widest text-accent">
+                    Welcome back
+                </p>
+                <h1 className="mt-3 text-center text-2xl font-semibold text-text-primary">
+                    Login to your account
+                </h1>
 
-                <div className="rounded-lg border border-border bg-surface p-6">
-                    <h1 className="text-lg font-semibold text-text-primary">Sign in</h1>
-                    <p className="mt-1 text-xs text-text-muted">
-                        Access your repository investigations.
-                    </p>
-
+                <form onSubmit={handleLogin} className="mt-8 rounded-xl border border-border bg-surface p-5 flex flex-col gap-4">
                     {error && (
-                        <div className="mt-4 rounded-md border border-danger/30 bg-danger/10 px-3 py-2 text-xs text-danger">
+                        <div className="rounded-md border border-red-500/20 bg-red-500/5 p-3 text-sm text-red-500">
                             {error}
                         </div>
                     )}
+                    <div className="flex items-center gap-3 rounded-md border border-border bg-void px-3 py-3 focus-within:border-accent/40">
+                        <TbMail size={16} className="text-text-faint" />
+                        <input
+                            type="email"
+                            required
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="Email address"
+                            className="w-full bg-transparent text-sm text-text-primary placeholder:text-text-faint focus:outline-none"
+                        />
+                    </div>
 
-                    <form onSubmit={handleSubmit} className="mt-5 flex flex-col gap-4">
-                        <div>
-                            <label htmlFor="email" className="mb-1.5 block text-[11px] uppercase tracking-wide text-text-faint">
-                                Email
-                            </label>
-                            <input
-                                id="email"
-                                name="email"
-                                type="email"
-                                autoComplete="email"
-                                value={form.email}
-                                onChange={handleChange}
-                                placeholder="you@company.com"
-                                className="focus-ring w-full rounded-md border border-border bg-void px-3 py-2.5 text-sm text-text-primary placeholder:text-text-faint"
-                            />
-                        </div>
+                    <div className="flex items-center gap-3 rounded-md border border-border bg-void px-3 py-3 focus-within:border-accent/40">
+                        <TbLock size={16} className="text-text-faint" />
+                        <input
+                            type="password"
+                            required
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="Password"
+                            className="w-full bg-transparent text-sm text-text-primary placeholder:text-text-faint focus:outline-none"
+                        />
+                    </div>
 
-                        <div>
-                            <label htmlFor="password" className="mb-1.5 block text-[11px] uppercase tracking-wide text-text-faint">
-                                Password
-                            </label>
-                            <div className="relative">
-                                <input
-                                    id="password"
-                                    name="password"
-                                    type={showPassword ? "text" : "password"}
-                                    autoComplete="current-password"
-                                    value={form.password}
-                                    onChange={handleChange}
-                                    placeholder="••••••••"
-                                    className="focus-ring w-full rounded-md border border-border bg-void px-3 py-2.5 pr-10 text-sm text-text-primary placeholder:text-text-faint"
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowPassword((s) => !s)}
-                                    className="focus-ring absolute right-2.5 top-1/2 -translate-y-1/2 text-text-faint hover:text-text-primary"
-                                    aria-label={showPassword ? "Hide password" : "Show password"}
-                                >
-                                    {showPassword ? <TbEyeOff size={16} /> : <TbEye size={16} />}
-                                </button>
-                            </div>
-                        </div>
+                    <Button type="submit" className="mt-2 w-full" icon={TbArrowRight} iconPosition="right">
+                        Sign In
+                    </Button>
 
-                        <Button
-                            type="submit"
-                            className="mt-1 w-full"
-                            icon={TbArrowRight}
-                            iconPosition="right"
-                            disabled={loading}
-                        >
-                            {loading ? "Signing in..." : "Sign in"}
-                        </Button>
-                    </form>
-                </div>
-
-                <p className="mt-5 text-center text-xs text-text-muted">
-                    Don't have an account?{" "}
-                    <Link to="/signup" className="text-accent hover:underline">
-                        Create one
-                    </Link>
-                </p>
+                    <p className="mt-2 text-center text-xs text-text-muted">
+                        Don't have an account?{" "}
+                        <button type="button" onClick={() => navigate("/signup")} className="text-accent hover:underline focus:outline-none">
+                            Sign Up
+                        </button>
+                    </p>
+                </form>
             </div>
         </div>
     );

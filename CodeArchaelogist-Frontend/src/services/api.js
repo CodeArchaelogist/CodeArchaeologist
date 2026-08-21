@@ -163,27 +163,27 @@ export function getSuggestedQuestions() {
     return ["Backend not connected - switch to Demo Mode"];
 }
 
-export function signup(data) {
+export async function signup(data) {
     return request("/auth/signup", {
         method: "POST",
         body: JSON.stringify(data),
     });
 }
 
-export function login(data) {
+export async function login(data) {
     return request("/auth/login", {
         method: "POST",
         body: JSON.stringify(data),
     });
 }
 
-export function logout() {
+export async function logout() {
     return request("/auth/logout", {
         method: "POST",
     });
 }
 
-export function getMe() {
+export async function getMe() {
     return request("/auth/me");
 }
 

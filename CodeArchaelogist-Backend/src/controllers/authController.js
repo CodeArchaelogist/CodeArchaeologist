@@ -118,9 +118,8 @@ export async function login(req, res, next) {
             }).select("+password");
 
         if (!user) {
-            return res.status(401).json({
-                message:
-                    "Invalid email or password.",
+            return res.status(404).json({
+                message: "User data not found. Please sign up first.",
             });
         }
 

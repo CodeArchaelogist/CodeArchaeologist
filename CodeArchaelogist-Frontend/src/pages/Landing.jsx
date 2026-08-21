@@ -24,23 +24,43 @@ const agents = [
 export default function Landing() {
     const navigate = useNavigate();
     const [isDemoMode, setIsDemoMode] = useState(true);
+    const [toast, setToast] = useState({ message: "", visible: false });
 
     useEffect(() => {
         const currentMode = localStorage.getItem('DEMO_MODE') !== 'false';
         setIsDemoMode(currentMode);
     }, []);
 
+    useEffect(() => {
+        if (toast.visible) {
+            const timer = setTimeout(() => {
+                setToast({ message: "", visible: false });
+            }, 5000);
+            return () => clearTimeout(timer);
+        }
+    }, [toast.visible]);
+
     // The hidden toggle logic
     const handleToggleDemo = () => {
         const currentMode = localStorage.getItem('DEMO_MODE') !== 'false';
         const newMode = !currentMode;
         localStorage.setItem('DEMO_MODE', newMode);
-        alert(`Demo Mode is now ${newMode ? 'ON (Mock Data)' : 'OFF (Live API)'}`);
-        window.location.reload();
+        setIsDemoMode(newMode);
+        setToast({ message: `Demo Mode is now ${newMode ? 'ON (Mock Data)' : 'OFF (Live API)'}`, visible: true });
     };
 
     return (
         <div className="relative z-10 min-h-screen overflow-hidden text-text-primary">
+            {toast.visible && (
+                <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="fixed right-6 top-6 z-50 flex items-center gap-3 rounded-lg border border-border bg-surface-elevated px-4 py-3 shadow-lg shadow-black/50"
+                >
+                    <div className="h-2 w-2 rounded-full bg-accent animate-pulse" />
+                    <span className="font-mono text-xs text-text-primary">{toast.message}</span>
+                </motion.div>
+            )}
             <div className="relative">
                 {/* Top bar */}
                 <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
@@ -52,8 +72,11 @@ export default function Landing() {
                     </div>
                     <div className="flex items-center gap-3">
                         <ThemeToggle />
-                        <Button variant="secondary" size="sm" onClick={() => navigate("/analyze")}>
-                            Investigate a Repository
+                        <Button variant="secondary" size="sm" onClick={() => navigate("/login")}>
+                            Login
+                        </Button>
+                        <Button size="sm" onClick={() => navigate("/signup")}>
+                            Signup
                         </Button>
                     </div>
                 </header>

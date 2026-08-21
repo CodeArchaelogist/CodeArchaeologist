@@ -10,6 +10,8 @@ import DecisionForensics from "./pages/DecisionForensics.jsx";
 import RiskImpact from "./pages/RiskImpact.jsx";
 import AskArchaeologist from "./pages/AskArchaelogist.jsx";
 import DeepScanBackground from "./components/DeepScanBackground.jsx";
+import Login from "./pages/Login.jsx";
+import Signup from "./pages/Signup.jsx";
 
 export default function App() {
   return (
@@ -17,6 +19,8 @@ export default function App() {
       <DeepScanBackground />
       <Routes>
         <Route path="/" element={<Landing />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
         <Route path="/analyze" element={<RepositoryInput />} />
         <Route path="/investigation/:id" element={<Investigation />} />
 
