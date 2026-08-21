@@ -8,8 +8,7 @@ export async function analyzeCommit({
     question,
 }) {
     const aiServiceUrl =
-        process.env.AI_SERVICE_URL ||
-        "http://ai-service:8000";
+        process.env.AI_SERVICE_URL ;
 
     try {
         const response = await axios.post(
