@@ -69,13 +69,23 @@ export default function Profile() {
     }
 
     return (
-        <div className="flex flex-col gap-8 pb-16">
-
-            <PageHeader
-                eyebrow="Profile"
-                title="Investigator identity"
-            />
-
+        <div className="relative z-10 min-h-screen overflow-hidden text-text-primary">
+            {toast.visible && (
+                <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="fixed right-6 top-6 z-50 flex items-center gap-3 rounded-lg border border-border bg-surface-elevated px-4 py-3 shadow-lg shadow-black/50"
+                >
+                    <div className="h-2 w-2 rounded-full bg-accent animate-pulse" />
+                    <span className="font-mono text-xs text-text-primary">{toast.message}</span>
+                </motion.div>
+            )}
+            <div className="relative">
+                <PageHeader
+                    eyebrow="Profile"
+                    title="Investigator identity"
+                />
+            </div>
             {/* Identity */}
             <section className="grid grid-cols-1 gap-6 lg:grid-cols-3">
 

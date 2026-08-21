@@ -9,7 +9,6 @@ import { login } from "../services/api.js";
 export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
     const navigate = useNavigate();
 
     const [form, setForm] = useState({ email: "", password: "" });
