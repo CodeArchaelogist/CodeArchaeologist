@@ -443,6 +443,9 @@ function EmptyInvestigations() {
     );
 }
 
+
+/* ---------------- Helpers ---------------- */
+
 function getInitials(name = "") {
     const parts = name.trim().split(/\s+/).filter(Boolean);
 
