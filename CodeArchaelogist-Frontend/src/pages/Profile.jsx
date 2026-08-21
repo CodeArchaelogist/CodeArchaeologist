@@ -45,13 +45,13 @@ export default function Profile() {
         loadInvestigations();
     }, []);
 
-    const completedCount = investigations.filter(
-        (item) => item.status === "complete"
+    const completedCount = (Array.isArray(investigations) ? investigations : []).filter(
+        (item) => item?.status === "complete"
     ).length;
 
     const repositoryCount = new Set(
-        investigations
-            .map((item) => item.repositoryId?._id || item.repositoryId)
+        (Array.isArray(investigations) ? investigations : [])
+            .map((item) => item?.repositoryId?._id || item?.repositoryId)
             .filter(Boolean)
     ).size;
 
@@ -180,7 +180,7 @@ export default function Profile() {
                     <StatCard
                         icon={TbSearch}
                         label="Investigations"
-                        value={investigations.length}
+                        value={(Array.isArray(investigations) ? investigations : []).length}
                     />
 
                     <StatCard
@@ -229,18 +229,18 @@ export default function Profile() {
 
                 <div className="overflow-hidden rounded-lg border border-border">
 
-                    {investigations.length === 0 ? (
+                    {(!Array.isArray(investigations) || investigations.length === 0) ? (
                         <EmptyInvestigations />
                     ) : (
                         <div className="divide-y divide-border-subtle">
 
                             {investigations.slice(0, 8).map((investigation) => (
                                 <InvestigationRow
-                                    key={investigation._id}
+                                    key={investigation?._id || Math.random().toString()}
                                     investigation={investigation}
                                     onClick={() =>
                                         navigate(
-                                            `/dashboard/${investigation._id}`
+                                            `/dashboard/${investigation?._id}`
                                         )
                                     }
                                 />
