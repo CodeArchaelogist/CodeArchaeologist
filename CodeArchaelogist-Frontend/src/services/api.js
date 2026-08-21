@@ -18,18 +18,54 @@ const delay = (ms = 350) => new Promise((resolve) => setTimeout(resolve, ms));
 // The global check: Defaults to true (Demo Mode) unless explicitly set to false
 const isDemoMode = () => localStorage.getItem('DEMO_MODE') !== 'false';
 
+const API_BASE_URL =
+    import.meta.env.VITE_API_URL ||
+    "http://localhost:5000/api";
+
+async function request(
+    endpoint,
+    options = {}
+) {
+    const response = await fetch(
+        `${API_BASE_URL}${endpoint}`,
+        {
+            credentials: "include",
+
+            headers: {
+                "Content-Type":
+                    "application/json",
+                ...(options.headers || {}),
+            },
+
+            ...options,
+        }
+    );
+
+    let data = null;
+
+    try {
+        data = await response.json();
+    } catch {
+        data = null;
+    }
+
+    if (!response.ok) {
+        throw new Error(
+            data?.message ||
+            "Something went wrong."
+        );
+    }
+
+    return data;
+}
+
 // GET /api/investigations/:id
 export async function getInvestigation(id) {
     await delay();
     if (isDemoMode()) return { id, repository, agentPipeline, investigationLog };
 
-    // Live Mode Empty State
-    return {
-        id,
-        repository: { name: "No Data", owner: "Live API Active", files: [] },
-        agentPipeline: [],
-        investigationLog: []
-    };
+    // Live Mode: real backend call
+    return request(`/investigations/${id}`);
 }
 
 // GET /api/investigations/:id (full repository summary for the dashboard)
@@ -127,23 +163,37 @@ export function getSuggestedQuestions() {
     return ["Backend not connected - switch to Demo Mode"];
 }
 
-// --- AUTHENTICATION MOCKS ---
-export async function login(credentials) {
-    await delay();
-    return { token: "mock-demo-token-123", user: { id: "u_1", name: "Demo User", email: "demo@example.com" } };
+export function signup(data) {
+    return request("/auth/signup", {
+        method: "POST",
+        body: JSON.stringify(data),
+    });
 }
 
-export async function signup(userData) {
-    await delay();
-    return { token: "mock-demo-token-123", user: { id: "u_1", name: "Demo User", email: "demo@example.com" } };
+export function login(data) {
+    return request("/auth/login", {
+        method: "POST",
+        body: JSON.stringify(data),
+    });
 }
 
-export async function logout() {
-    await delay();
-    return { success: true };
+export function logout() {
+    return request("/auth/logout", {
+        method: "POST",
+    });
 }
 
-export async function getMe() {
-    await delay();
-    return { id: "u_1", name: "Demo User", email: "demo@example.com" };
+export function getMe() {
+    return request("/auth/me");
+}
+
+export function createInvestigation(data) {
+    return request("/investigations", {
+        method: "POST",
+        body: JSON.stringify(data),
+    });
+}
+
+export function getInvestigations() {
+    return request("/investigations");
 }
