@@ -138,6 +138,7 @@ CodeArchaeologist investigates the repository to reconstruct that missing contex
 -  Asynchronous Investigation Workflow
 -  Advanced Knowledge Graph
 -  Demo Mode
+-  Dark and light theme toggler
 ---
 
 #  What Makes CodeArchaeologist Different?
