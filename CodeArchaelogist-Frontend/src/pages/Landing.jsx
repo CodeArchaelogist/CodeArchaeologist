@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { TbArrowRight, TbGitCommit, TbCircleDot, TbSearch, TbBrain, TbLayersIntersect } from "react-icons/tb";
@@ -22,6 +23,12 @@ const agents = [
 
 export default function Landing() {
     const navigate = useNavigate();
+    const [isDemoMode, setIsDemoMode] = useState(true);
+
+    useEffect(() => {
+        const currentMode = localStorage.getItem('DEMO_MODE') !== 'false';
+        setIsDemoMode(currentMode);
+    }, []);
 
     // The hidden toggle logic
     const handleToggleDemo = () => {
@@ -73,13 +80,15 @@ export default function Landing() {
                             <Button size="lg" icon={TbArrowRight} iconPosition="right" onClick={() => navigate("/analyze")}>
                                 Investigate a Repository
                             </Button>
-                            <Button
-                                variant="secondary"
-                                size="lg"
-                                onClick={() => navigate("/dashboard/inv_8f3a2c")}
-                            >
-                                Explore Demo
-                            </Button>
+                            {isDemoMode && (
+                                <Button
+                                    variant="secondary"
+                                    size="lg"
+                                    onClick={() => navigate("/dashboard/inv_8f3a2c")}
+                                >
+                                    Explore Demo
+                                </Button>
+                            )}
                         </div>
                     </motion.div>
 
