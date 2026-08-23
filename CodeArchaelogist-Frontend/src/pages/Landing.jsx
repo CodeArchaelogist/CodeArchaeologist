@@ -89,6 +89,9 @@ export default function Landing() {
                     </div>
                     <div className="flex items-center gap-3">
                         <ThemeToggle />
+                        <Button variant="secondary" size="sm" onClick={() => navigate("/signup")}>
+                            Sign Up
+                        </Button>
                         <Button variant="secondary" size="sm" onClick={() => navigate("/login")}>
                             Login
                         </Button>
