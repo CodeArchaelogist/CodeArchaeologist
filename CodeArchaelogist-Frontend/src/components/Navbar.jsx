@@ -1,7 +1,7 @@
 import { TbBrandGithub, TbExternalLink, TbMenu2 } from "react-icons/tb";
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
-import SearchBar from "./SearchBar.jsx";
+import SearchBar from "./Searchbar.jsx";
 import StatusBadge from "./ui/StatusBadge.jsx";
 import ThemeToggle from "./ui/ThemeToggle.jsx";
 // REMOVED the direct mockData import.
