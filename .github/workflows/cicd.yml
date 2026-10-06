@@ -5,17 +5,26 @@ on:
         branches: [main]
     workflow_dispatch:
 
-strategy:
-    matrix:
-        images: [frontend, backend, ai]
-
 jobs:
-    code:
+    code-ai:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout the code
               uses: actions/checkout@v4
-            
+
+            - name: setup python for ai 
+              uses: actions/setup-python@v5
+              with:
+                python-version: "3.10"
+
+            - name: Install linting tools
+              run: pip install flake8
+
+            - name: run the linting tools
+              run: |
+                  cd CodeArchaelogist-AI
+                  flake8 . --exclude=env,venv
+
             - name: Login to dockerhub
               uses: docker/login-action@v4
               with:
@@ -25,9 +34,6 @@ jobs:
             - name: docker build push 
               uses: docker/build-push-action@v5
               with:
-                context: .
+                context: ./CodeArchaelogist-AI
                 push: true
-                tags: ${{ vars.username }}/code-archaelogist-${{ matrix.images }}:${{ github.sha }}
-            
-            - name: Check linter
-              uses: flake8 app.py
+                tags: ${{ vars.username }}/code-archaelogist-AI:${{ github.sha }}
