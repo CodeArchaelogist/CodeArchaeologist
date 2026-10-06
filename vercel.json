@@ -1,0 +1,37 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "services": {
+    "codearchaelogist-frontend": {
+      "root": "CodeArchaelogist-Frontend",
+      "framework": "vite"
+    },
+    "codearchaelogist-backend": {
+      "root": "CodeArchaelogist-Backend",
+      "framework": "express"
+    },
+    "codearchaelogist-ai": {
+      "root": "CodeArchaelogist-AI",
+      "framework": "fastapi"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/ai/(.*)",
+      "destination": {
+        "service": "codearchaelogist-ai"
+      }
+    },
+    {
+      "source": "/api/(.*)",
+      "destination": {
+        "service": "codearchaelogist-backend"
+      }
+    },
+    {
+      "source": "/(.*)",
+      "destination": {
+        "service": "codearchaelogist-frontend"
+      }
+    }
+  ]
+}
