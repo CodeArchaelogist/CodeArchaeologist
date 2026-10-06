@@ -1,0 +1,33 @@
+name: cicd.yml
+
+on:
+    push:
+        branches: [main]
+    workflow_dispatch:
+
+strategy:
+    matrix:
+        images: [frontend, backend, ai]
+
+jobs:
+    code:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout the code
+              uses: actions/checkout@v4
+            
+            - name: Login to dockerhub
+              uses: docker/login-action@v4
+              with:
+                username: ${{ vars.username }}
+                password: ${{ secrets.password }}
+
+            - name: docker build push 
+              uses: docker/build-push-action@v5
+              with:
+                context: .
+                push: true
+                tags: ${{ vars.username }}/code-archaelogist-${{ matrix.images }}:${{ github.sha }}
+            
+            - name: Check linter
+              uses: flake8 app.py
